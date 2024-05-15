@@ -1,0 +1,268 @@
+body{
+    background-color: black;
+    font-family: 'Oswald', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: white;
+}
+
+.uvod{
+    margin-bottom: 0%;
+}
+
+.header{
+    width: 100%;
+    opacity: 0;
+    transition: 3s;
+}
+.header ul{
+    list-style: none;
+    display: inline-flex;
+    justify-content: space-between;
+    width: 60%;
+    margin: 0 17.5%;
+}
+.header ul li{
+    margin: 3% 5%;
+    text-align: center;
+}
+.header ul li a{
+    font-size: 5vh;
+    color: white;
+    font-weight: bold;
+    text-decoration: none 5px solid white;
+}
+.header ul li a::after{
+    content: '';
+    width: 0px;
+    height: 3px;
+    display: block;
+    background: #d3762f;
+    transition: .7s;
+}
+.header ul li a:hover::after{
+    width: 100%;
+}
+
+h1{
+    font-size: 10vw;
+    font-weight: bold;
+    color: white;
+    margin:  0;
+    margin-left: 15%;
+    padding: 0;
+}
+
+h2{
+    text-align: center;
+    font-size: 4.5vw;
+    font-weight: bold;
+    color: white;
+    text-decoration: underline 5px solid #d3762f;
+    padding: 0;
+}
+
+h3{
+    text-align: center;
+    font-size: 2.5vw;
+    font-weight: bold;
+    color: #d3762f;
+    margin: 0;
+    margin: 3% 0;
+    padding: 0;
+}
+
+h4{
+    text-align: center;
+    font-size: 2vw;
+    font-style: italic;
+    font-weight: 400;
+    color: black;
+    padding: 5%;
+    margin: 0%;
+}
+
+h6{
+    font-size: 5vw;
+    font-weight: 900;
+    margin: 8% 5%;
+}
+
+.js-nazev{
+    left: 0;
+    top: 60vh;
+    text-align: center;
+    height: 10vw;
+    position: absolute;
+    transition: top .35s ease-out;
+}
+
+.nazev-holder {
+    position: relative;
+    /* border: 5px solid white; */
+    width: 100%;
+    height: 50vh;
+}
+
+.drip{
+    background-color: white;
+    color: black;
+    visibility: hidden;
+    margin-top: 10%;
+    opacity: 0;
+}
+
+.game{
+    background-color: white;
+    color: black;
+    visibility: hidden;
+    opacity: 0;
+}
+.game h2{
+    margin: 0;
+    text-align: center;
+    font-size: 6vh;
+    font-weight: normal;
+    padding: 7% 5%;
+}
+
+#game-board {
+    width: 60%;
+    height: 700px;
+    margin: 0 21%;
+    position: relative;
+}
+
+.hexagon {
+    position: absolute;
+    width: 70px;
+    height: 82px;
+    background-color: #d3762f;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    line-height: 115.47px;
+    text-align: center;
+    color: #fff;
+    cursor: pointer;
+}
+
+.hexagon:hover {
+    background-color: #925222;
+}
+
+#win{
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    margin: auto;
+    transition: 7s;
+    color: white;
+    top: 200%;
+    left: 15%;
+}
+
+#lose{
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    margin: auto;
+    transition: 7s;
+    color: white;
+    top: 200%;
+    left: 13%;
+}
+
+.popis img{
+    width: 75%;
+    margin:  0 12.2%;
+}
+
+.kontejnr {
+    position: relative;
+    max-width: 100%;
+    margin-bottom: 7%;
+}
+.kontejnr img.main{
+    border: 4px solid white;
+}
+.kontejnr img.hovr {
+    border: 4px solid white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 1.2s;
+}
+.kontejnr:hover img.hovr {
+    opacity: 0.8;
+}
+.kontejnr:hover img.main {
+    opacity: 0;
+    transition: 1.3s;
+}
+.kontejnr p {
+    position: absolute;
+    font-size: 1.2vw;
+    text-align: justify;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: 3% 12.5%;
+    opacity: 0;
+}
+.kontejnr:hover p{
+    opacity: 1;
+    transition: 1.2s;
+}
+
+.trailer{
+    margin-left: 0%;
+    margin-top: 1%;
+}
+.season1{
+    display: inline-flex;
+}
+.season1 p{
+    text-align: justify;
+    width: 35%;
+    font-size: 1.3vw;
+    padding-left: 3%;
+    padding-top: 1.5%;
+}
+
+.boxik{
+    width: 48%;
+    height: 600px;
+    position: relative;
+}
+.boxik img{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+.origo {
+    display: inline-flex;
+}
+
+.head{
+    color: #d3762f;
+    font-size: 1.5vw;
+    font-weight: bold;
+}
+
+table {
+    width: 80%;
+    margin: 0 10%;
+}
+table td{
+    border: 1.5px solid white;
+}
+table tr td{
+    text-align: center;
+    min-width: 20%;
+    padding: .7% 1%;
+    margin: 0;
+}

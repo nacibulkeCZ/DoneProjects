@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <title>Fleabag</title>
+        <meta charset="UTF-8">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;400;500;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="uvod">
+            <div class="header">
+                <ul>
+                    <li><a href="index.html">INTRODUCTION</a></li>
+                    <li><a href="characters.html">CHARACTERS</a></li>
+                    <li><a href="origin.html">EPISODES</a></li>
+                </ul>
+            </div>
+        </div>
+        <h2>STORY</h2>
+        <h2 id="seasonNum" style="color: #d3762f; text-decoration: none;">SEASON 1</h2>
+        <div class="season1">
+            <h6 id="left" onClick="newSrc();" style="opacity: 0;"><</h6>
+            <iframe src="https://www.youtube.com/embed/FhZHv2id6Sk?si=04vd0EnWzXeGPR2s" style="width:660px;height:385px;overflow:scroll; border: none;" id="MyFrame"></iframe>
+            <p id="text">Fleabag, the owner of a struggling café, appears to apply for a business loan, has arguments with her stepmother, engages in a love-hate relationship with her more seasoned sister, and juggles a dimwitted boyfriend and a hookup. Throughout the course of the season, she experiences flashbacks of a tragic event that includes her late best friend who 
+                was also her business partner. Furthermore, Fleabag, who is frequently enraged and grieving rejects anyone who even hints at trying to help her. As her guinea pig eatery continues to struggle throughout the season, she is exposed and we get an unfiltered view of a person trying to cope with guilt.</p>
+            <h6 id="right" onClick="newSrc();">></h6>
+        </div>
+
+        <div class="origin" style="margin-top: 10%;">
+            <h2>ORIGIN</h2>
+            <div class="origo">
+                <div class="boxik">
+                    <img class="mySlides" src="img/phoebe.jpg">
+                    <img class="mySlides" src="img/phoebe2.jpg">
+                </div>
+                <div class="textus" style="width: 48%; text-align: justify; padding-right: 5%; font-size: 1.15vw;">
+                    <p>Fleabag is a British comedy-drama television series created and written by Phoebe Waller-Bridge, based on her one-woman show first 
+                        performed in 2013 at the Edinburgh Fringe Festival. <br><br>It was originally produced by Two Brothers Pictures for digital channel BBC Three in a 
+                        co-production agreement with Amazon Studios. Waller-Bridge stars as the title character, a free-spirited but angry and confused young woman 
+                        in London. Sian Clifford stars as Fleabag's sister Claire, while Andrew Scott joined the cast in the second series as 'The Priest'. <br><br>The protagonist frequently breaks the fourth wall to provide exposition, internal monologues, and a running commentary to the audience. The show premiered on 21 July 2016 and concluded its second and final series on 8 April 2019 It received widespread acclaim from critics, particularly for its writing, acting, and the uniqueness and personality of the title character. Many critics and viewers have called it one of the greatest comedy series of all time. <br><br>Waller-Bridge won the British Academy Television Award for Best Female Comedy Performance for the first series. The second series received 11 Primetime Emmy Award nominations and won six, with Waller-Bridge earning Outstanding Comedy Series, Outstanding Lead Actress, and Outstanding Writing for a Comedy Series; additional acting nominations were received by Clifford, Olivia Colman, and guest stars Fiona Shaw and Kristin Scott Thomas. The series received the Golden Globe Award for Best Television Series and Best Actress for Waller-Bridge, and a nomination for 
+                        Scott. The show is adapted from Waller-Bridge's 2013 Edinburgh Festival Fringe one-woman play of the same name which won a Fringe First Award. </p>
+                    
+                </div> 
+            </div>
+        </div>
+        </body>
+    <script>
+        window.addEventListener('load', () => {  
+        document.getElementsByClassName('header')[0].style.opacity = 100;
+    });
+
+    var slideIndex = 0;
+    carousel();
+
+    function carousel() {
+        var i;
+        var x = document.getElementsByClassName("mySlides");
+        for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";
+        }
+        slideIndex++;
+        if (slideIndex > x.length) {slideIndex = 1}
+        x[slideIndex-1].style.display = "block";
+        setTimeout(carousel, 2000); // Change image every 2 seconds
+    }
+
+        i = 1;
+        function newSrc() {
+            if(i == 1){
+                i = 2;
+                var newSrc = "https://www.youtube.com/embed/aX2ViKQFL_k?si=UEm8G52dmudW9w-N";
+                var newText = "While Fleabag has changed a lot during the hiatus, in particular when it comes to her relationship with herself, her Father, Godmother, sister Claire, and brother-in-law Martin have been stuck in their own emotional holding patterns. While Claire loves working in Finland, her relationship with alcoholic Martin is worse than ever. Fleabag’s Father and Godmother are now engaged. Fleabag finds a kindred spirit at the dinner table in the form of Hot Priest, the man who will be marrying Father and Godmother at their wedding. Like Fleabag, his pain and healing comes out in the form of socially-inappropriate honesty, often with a comedic twist."
+                document.getElementById("right").style.opacity = 0;
+                document.getElementById("left").style.opacity = 100;
+            }
+            else{
+                i = 1;
+                var newSrc = "https://www.youtube.com/embed/FhZHv2id6Sk?si=04vd0EnWzXeGPR2s";
+                var newText = "Fleabag, the owner of a struggling café, appears to apply for a business loan, has arguments with herz stepmother, engages in a love-hate relationship with her more seasoned sister, and juggles a dimwitted boyfriend and a hookup. Throughout the course of the season, she experiences flashbacks of a tragic event that includes her late best friend who was also her business partner. Furthermore, Fleabag, who is frequently enraged and grieving rejects anyone who even hints at trying to help her. As her guinea pig eatery continues to struggle throughout the season, she is exposed and we get an unfiltered view of a person trying to cope with guilt."
+                document.getElementById("left").style.opacity = 0;
+                document.getElementById("right").style.opacity = 100;
+            }
+            document.getElementById("MyFrame").src=newSrc;
+            document.getElementById("text").innerHTML=newText;
+            document.getElementById("seasonNum").innerHTML="SEASON " + i;
+        }
+
+        window.addEventListener('load', () => {  
+            document.getElementsByClassName('header')[0].style.opacity = 100;
+        });
+
+    </script>
+</html>

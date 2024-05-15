@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <title>Fleabag</title>
+        <meta charset="UTF-8">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;400;500;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="uvod">
+            <div class="header">
+                <ul>
+                    <li><a href="characters.html">CHARACTERS</a></li>
+                    <li><a href="story.html">STORY</a></li>
+                    <li><a href="origin.html">EPISODES</a></li>
+                </ul>
+            </div>
+            <div class="nazev-holder">
+                <div class="js-nazev">
+                    <h1 id="title">FLEABAG</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="drip">
+            <img src="img/drip.png" style="width: 100%;">
+        </div>
+
+        <div class="game">
+            <h4>“You already know what you’re going to do. Everybody does.”</h4>
+            <div id="game-board">
+                <img id="fox" src="img/fox_front.png" alt="Fox Image" style="visibility: hidden; width: 80px; position: relative; transition: .75s;">
+            </div>
+        </div>
+        <h4 id="win"><span style="color: #d3762f; font-style: normal; font-weight: bold;">You trapped the fox!</span> <br>“Why believe in something awful when you can believe in something wonderful?”</h4>
+        <h4 id="lose"><span style="color: #d3762f; font-style: normal; font-weight: bold;">You lost the fox.</span> <br>“I think you know how to love better than any of us. That’s why you find it all so painful.”</h4>
+    </body>
+</html>
+
+<script>
+    let title = document.querySelector('.js-nazev');
+    let bounceCount = 0;
+    let bounceLenght = 40;
+    let bounceTime = .30;
+    let clickCount = 0;
+
+    function hopUp(lenght, time){
+        bounceCount = bounceCount + 1;
+        title.style.setProperty("transition", "top " + time + "s ease-out", "important");
+        title.style.top = parseInt(title.style.top) - lenght + 'vh';
+    }
+
+    function hopDown(lenght, time){
+        bounceCount = bounceCount + 1;
+        title.style.setProperty("transition", "top " + time + "s ease-in", "important");
+        title.style.top = parseInt(title.style.top) + lenght + 'vh';
+    }
+
+    title.addEventListener('click', () => {
+        if(bounceCount == 0)
+        {
+            hopUp(bounceLenght, bounceTime);
+        }
+    });
+
+    title.addEventListener("transitionend", () => {
+        if(bounceCount != 0)
+        {
+            if(bounceCount % 2 == 1){
+                bounceTime = bounceTime - .05;
+                hopDown(bounceLenght, bounceTime);
+                if(bounceLenght <= 10){
+                    bounceLenght = 40;
+                    bounceTime = .30;
+                    bounceCount = 0;
+                    clickCount = clickCount + 1;
+                    if(clickCount == 1){
+                        document.getElementsByClassName('header')[0].style.opacity = 100;
+                    }
+                    if(clickCount == 2){
+                        document.getElementsByClassName('drip')[0].style.visibility = "visible";
+                        document.getElementsByClassName('drip')[0].style.opacity = 100;
+                        document.getElementsByClassName('game')[0].style.visibility = "visible";
+                        document.getElementsByClassName('game')[0].style.opacity = 100;
+                    }
+                }
+            }
+            else if(bounceCount % 2 == 0){
+                bounceLenght = bounceLenght - 10;
+                hopUp(bounceLenght, bounceTime);
+            }
+        }
+    });
+
+    window.addEventListener('load', () => {
+        
+        title.style.position = 'absolute';
+        title.style.left = 0;
+        title.style.top = 40 + 'vh';
+    });
+
+    const numRows = 11;
+    const numCols = 9;
+    let allTiles = [];
+    let winTiles = [];
+    let doomed = false;
+    let foxCoordinates = [0, 0];
+
+    function findRealPath(){
+        queueList = [];
+        routesList = []; 
+        let i = 0;
+        checkedTile = [];
+        nextStep = [];
+        startTile = [];
+        let previousMove = [0, 0];
+
+        while(i < winTiles.length){
+            startTile = [winTiles[i][0], winTiles[i][1]];         
+            mDistance = hexagonalDistance(startTile, foxCoordinates); //teoreticka vzdalenost
+
+            routesList.push([startTile[0], startTile[1], mDistance]);
+            routesList.sort((a, b) => a[2] - b[2]);
+            i++;
+        }
+        i = 0;
+        lengthsList = [];
+
+        while(i < routesList.length){
+            startTile = [routesList[i][0], routesList[i][1]];
+            checkedTile = startTile;
+            queueList = [[checkedTile[0], checkedTile[1], 0]];
+            moveCount = 0;
+            turn = 0;
+            coord = [];
+            bool = false;
+
+            while(!checkArrays(foxCoordinates, checkedTile)){
+                moveCount++;
+                prevMove = checkedTile;
+                possibleList = getBestUnoccupiedMove(checkedTile, foxCoordinates, previousMove);
+
+                for(possible of possibleList){
+                    if(checkArrays(foxCoordinates, possible)){
+                        if(!searchInQueue(lengthsList, checkedTile)){
+                            lengthsList.push([checkedTile[0], checkedTile[1],turn + 1]);
+                        }
+                        else{
+                            for(sublist of lengthsList){
+                                if(sublist[0] === checkedTile[0] && sublist[1] === checkedTile[1] && turn < checkedTile[2]){
+                                    lengthsList.push([checkedTile[0], checkedTile[1], turn]);
+                                }
+                            }
+                        }
+                        
+                        checkedTile = foxCoordinates;
+                        bool = true;
+                        break;
+                    }
+                    if(!searchInQueue(queueList, possible)){
+                        queueList.push([possible[0], possible[1], turn]);
+                    }
+                }
+
+                if(bool){
+                    break;
+                }
+
+                previousMove = prevMove;
+                if(moveCount >= queueList.length){
+                    break; 
+                }
+                checkedTile = [queueList[moveCount][0],queueList[moveCount][1]];
+                turn = queueList[moveCount][2] + 1;
+            }
+            
+            i++;
+        }
+        return lengthsList
+    }
+
+    function hexagonalDistance(axial1, axial2) {
+        const [x1, z1] = axial1;
+        const [x2, z2] = axial2;
+
+        const distance = (Math.abs(x1 - x2) + Math.abs(x1 + z1 - x2 - z2) + Math.abs(z1 - z2)) / 2;
+
+        return distance;
+    }
+
+    function getBestUnoccupiedMove(currentHex, targetHex, previousMove) {
+        const directions = [
+            [1, 0], [-1, 0], [0, 1], [0, -1], [-1, 1], [1, -1]
+        ];
+
+        // vzdalenost k targetu
+        const [targetQ, targetR] = targetHex;
+        const bestDirection = [targetQ - currentHex[0], targetR - currentHex[1]];
+
+        let bestMove = null;
+        let bestDistance = Infinity;
+        validMoves = [];
+
+        for (const direction of directions) {
+            const neighborHex = [currentHex[0] + direction[0], currentHex[1] + direction[1]];
+
+            // Check if the neighbor is not occupied
+            const isOccupied = allTiles.some(coord => coord[0] === neighborHex[0] && coord[1] === neighborHex[1] && coord[2] === true);
+
+            if (!isOccupied && !checkArrays(neighborHex, previousMove) && searchInQueue(allTiles, neighborHex)) {
+                // Calculate the distance to the target in this direction
+                const distance = Math.sqrt(
+                    (targetQ - neighborHex[0]) ** 2 + (targetR - neighborHex[1]) ** 2
+                );
+
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestMove = neighborHex;
+                }
+
+                validMoves.push(neighborHex);               
+            }
+        }
+
+        return validMoves;
+    }
+
+    function getUnoccupiedMove(currentHex, previousMove) {
+        const directions = [
+            [1, 0], [-1, 0], [0, 1], [0, -1], [-1, 1], [1, -1]
+        ];
+
+        validMove = null;
+
+        for (const direction of directions) {
+            const neighborHex = [currentHex[0] + direction[0], currentHex[1] + direction[1]];
+
+            // Check if the neighbor is not occupied
+            const isOccupied = allTiles.some(coord => coord[0] === neighborHex[0] && coord[1] === neighborHex[1] && coord[2] === true);
+
+            if (!isOccupied && !checkArrays(neighborHex, previousMove)) {
+                validMove = neighborHex;
+                return validMove
+            }
+        }
+
+        for (const direction of directions) {
+            const neighborHex = [currentHex[0] + direction[0], currentHex[1] + direction[1]];
+
+            // Check if the neighbor is not occupied
+            const isOccupied = allTiles.some(coord => coord[0] === neighborHex[0] && coord[1] === neighborHex[1] && coord[2] === true);
+
+            if (!isOccupied) {
+                validMove = neighborHex;
+            }
+        }
+
+        return validMove;
+    }
+
+    function checkArrays(arr1, arr2){
+        var j;
+        
+        if(arr2.length === arr1.length){
+            for(j = 0; j < arr2.length && arr2[j] === arr1[j]; ++j);
+                if(j === arr2.length){
+                    return true;
+                }
+        }
+        return false;
+    }
+
+    function searchForArray(haystack, needle){
+        if(haystack == null){
+            return false
+        }
+        var i, j, current;
+        for(i = 0; i < haystack.length; ++i){
+            if(needle.length === haystack[i].length){
+                current = haystack[i];
+                for(j = 0; j < needle.length && needle[j] === current[j]; ++j);
+                    if(j === needle.length)
+                        return true;
+            }
+        }
+        return false;
+    }
+
+    function searchInQueue(haystack, needle){
+        var i, j, current;
+        for(i = 0; i < haystack.length; ++i){
+            if(needle.length === haystack[i].length - 1){
+                current = haystack[i];
+                for(j = 0; j < needle.length && needle[j] === current[j]; ++j);
+                    if(j === needle.length)
+                        return true;
+            }
+        }
+        return false;
+    }
+
+    function oddROffsetToAxial(row, col) {
+        const q = col - 4;
+        const r = row - Math.floor((col - (col % 2)) / 2) - 3;
+        return [q, r];
+    }
+
+    //---------------------------------------------------------------------------------------------------------------
+
+    function createHexagon(xX, yY) {
+        const hexagon = document.createElement('div');
+        hexagon.className = 'hexagon';
+        hexagon.style.left = xX + 'px';
+        hexagon.style.top = yY + 'px';
+        hexagon.style.zIndex = 0;
+        hexagon.isWall = false;
+        hexagon.x = Math.floor(xX/80);
+        hexagon.y = yY / 70;
+        probability = Math.floor(Math.random() * 6);
+        prevMove = [];
+
+        if(probability == 1 &&!(oddROffsetToAxial(hexagon.x, hexagon.y)[0] == 0 && oddROffsetToAxial(hexagon.x, hexagon.y)[1] == 0)){
+            allTiles.push([oddROffsetToAxial(hexagon.x, hexagon.y)[0], oddROffsetToAxial(hexagon.x,hexagon.y)[1], true]); 
+            hexagon.style.backgroundColor = '#925222';
+            hexagon.isWall = true;
+        }
+        else{
+            allTiles.push([oddROffsetToAxial(hexagon.x, hexagon.y)[0], oddROffsetToAxial(hexagon.x,hexagon.y)[1], false]);  
+        }  
+
+        if((hexagon.x == 0 || hexagon.y == 0 || hexagon.x == 10 || hexagon.y == 8) && !hexagon.isWall){
+            winTiles.push(oddROffsetToAxial(hexagon.x, hexagon.y));
+        }
+        document.getElementById('game-board').appendChild(hexagon);
+
+        hexagon.addEventListener('click', () => {
+            if(searchForArray(winTiles, foxCoordinates)){
+                console.log("typico");
+                document.getElementsByClassName('drip')[0].style.opacity = 0;
+                document.getElementsByClassName('drip')[0].style.visibility = "hidden";
+                document.getElementsByClassName('game')[0].style.opacity = 0;
+                document.getElementsByClassName('game')[0].style.visibility = "hidden";
+                document.getElementById('lose').style.visibility = 'visible';
+                document.getElementById('lose').style.opacity = 100;
+                return
+            }
+
+            if (!hexagon.isWall) {
+                hexagon.style.backgroundColor = '#925222';
+                hexagon.isWall = true;
+                for (let i = 0; i < allTiles.length; i++) {
+                    item = [allTiles[i][0], allTiles[i][1]];
+                    if(checkArrays(item, oddROffsetToAxial(hexagon.x, hexagon.y))){
+                        allTiles[i][2] = true;
+                        break;
+                    }
+                }
+                
+                if(searchForArray(winTiles, oddROffsetToAxial(hexagon.x, hexagon.y))){
+                    for (let i = 0; i < allTiles.length; i++) {
+                        item = [winTiles[i][0], winTiles[i][1]];
+                        if(checkArrays(item, oddROffsetToAxial(hexagon.x, hexagon.y))){
+                            winTiles.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+
+                if(doomed){
+                    possibilities = [getUnoccupiedMove(foxCoordinates, prevMove)];
+                    if(possibilities[0] == null){
+                        console.log("konec");
+                        document.getElementsByClassName('drip')[0].style.opacity = 0;
+                        document.getElementsByClassName('drip')[0].style.visibility = "hidden";
+                        document.getElementsByClassName('game')[0].style.opacity = 0;
+                        document.getElementsByClassName('game')[0].style.visibility = "hidden";
+                        document.getElementById('win').style.visibility = 'visible';
+                        document.getElementById('win').style.opacity = 100;
+                        return
+                    }
+                    console.log(possibilities);
+                    realMove = [possibilities[0][0] - foxCoordinates[0], possibilities[0][1] - foxCoordinates[1]];
+                }
+                else{
+                    possibilities = findRealPath();
+                    if(possibilities.length == 0){
+                        doomed = true;
+                        console.log("niic");
+                        possibilities = [getUnoccupiedMove(foxCoordinates, prevMove)];
+                        if(possibilities.length == 0){
+                            console.log("konec");
+                        }
+                        console.log(possibilities);
+                        realMove = [possibilities[0][0] - foxCoordinates[0], possibilities[0][1] - foxCoordinates[1]];
+                    }
+                    else{
+                        possibilities.sort((a, b) => a[2] - b[2]);
+                        console.log(possibilities);
+                        realMove = [possibilities[0][0] - foxCoordinates[0], possibilities[0][1] - foxCoordinates[1]]
+                    }
+                }
+        
+                minusValue = 0;
+                if ((possibilities[0][0] == foxCoordinates[0] - 1 && possibilities[0][1] == foxCoordinates[1] + 1) || (possibilities[0][0] == foxCoordinates[0] + 1 && possibilities[0][1] == foxCoordinates[1])) {
+                    // offset kazdeho druheho radku
+                    minusValue = +40;
+                }
+                else if ((possibilities[0][0] == foxCoordinates[0] - 1 && possibilities[0][1] == foxCoordinates[1]) || (possibilities[0][0] == foxCoordinates[0] + 1 && possibilities[0][1] == foxCoordinates[1] -1)) {
+                    // offset kazdeho druheho radku
+                    minusValue = -40;
+                }
+                else if(possibilities[0][1] == foxCoordinates[1] - 1){
+                    minusValue = -80;
+                }
+                else{
+                    minusValue = +80;
+                }
+                
+                prevMove = foxCoordinates;
+                foxCoordinates = [possibilities[0][0], possibilities[0][1]]
+                const foxImage = document.getElementById('fox');
+                
+                let x = (parseInt(foxImage.style.top)) + (realMove[0] * 70); 
+                let y = parseInt(foxImage.style.left);
+                y += minusValue;
+
+                foxImage.style.left = y + 'px';
+                foxImage.style.top = x + 'px'; 
+            }
+        });
+    }
+
+    function createHexagonGrid() {
+        for (let row = 0; row < numRows; row++) {
+            for (let col = 0; col < numCols; col++) {
+                let x = row * 80; 
+                let y = col * 70;
+                if (col % 2 != 0) {
+                    // offset kazdeho druheho radku
+                    x += 40;
+                }
+
+                createHexagon(x, y);
+                if(row == 5 & col == 4){
+                    const foxImage = document.getElementById('fox');
+
+                    foxImage.style.left = x + 'px';
+                    foxImage.style.top = y - 18 + 'px';
+                    foxImage.style.visibility = 'visible';
+                    foxImage.style.zIndex = '100';
+                }
+            }
+        }
+    }
+
+    createHexagonGrid();
+</script>
