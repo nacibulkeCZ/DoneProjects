@@ -1,0 +1,2473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <title>Room</title>
+</head>
+<body>
+  <div class="vignette"></div>
+  <div id="getReady" style="position: absolute;">
+    <h1 style="text-align: center;">Room</h1>
+    <p id="messagesList" style="text-align: center;"></p>
+    <div id="notification" style="color: red;"></div>
+    <div class="buttonsStart">
+      <button id="leaveRoomButton">Leave Room</button>
+      <button id="isReadyButton">I am ready</button>
+    </div>
+  </div>
+
+  <div class="game" id="game">
+    <div class="ui" id="ui">
+      <div class="oponentInfo">
+        <img src="" id="oponentAvatar">
+        <p id="oponentSources">15</p>
+      </div>
+      <div class="basicInfo">
+        <img src="" id="avatar">
+        <p id="sources">15</p>
+      </div>
+
+      <div class="coinFlip" id="coinFlipDiv">
+        <div class="coin" id="coin">
+          <img id="coinImage" src="imgs/coinPaws.png" alt="Coin">
+        </div>
+        <div class="winnerChoiceButtons" style="display: none;" id="winnerChoiceButtons">
+          <button id="pickOrangeButton" onclick="pick('orange');">Pick Orange race</button>
+          <button id="pickBlackButton" onclick="pick('black');">Pick Black & white race</button>
+          <button id="startFirstButton" onclick="pick('start');">Start first</button>
+        </div>
+      </div>
+
+      <div class="mulligan" id="mulligan">
+        <h2>Are you happy with the deck?</h2>
+        <div class="mulliganButtons">
+          <button id="yesButton" onclick="actualMulligan(false);">Yes</button>
+          <button id="mulliganButton" onclick="actualMulligan(true);">Mulligan</button>
+        </div>
+      </div>
+
+      <div class="board" id="board">
+        <table>
+          <tr>
+            <td><img src="imgs/empty.png" id="tile1" ></td>
+            <td><img src="imgs/empty.png" id="tile2" ></td>
+            <td><img src="imgs/empty.png" id="tile3" ></td>
+            <td><img src="imgs/empty.png" id="tile4" ></td>
+            <td><img src="imgs/empty.png" id="tile5" ></td>
+          </tr>
+          <tr>
+            <td><img src="imgs/empty.png" id="tile6" ></td>
+            <td><img src="imgs/empty.png" id="tile7" ></td>
+            <td><img src="imgs/empty.png" id="tile8" ></td>
+            <td><img src="imgs/empty.png" id="tile9" ></td>
+            <td><img src="imgs/empty.png" id="tile10" ></td>
+          </tr>
+          <tr>
+            <td><img src="imgs/empty.png" id="tile11" ></td>
+            <td><img src="imgs/empty.png" id="tile12" ></td>
+            <td><img src="imgs/empty.png" id="tile13" ></td>
+            <td><img src="imgs/empty.png" id="tile14" ></td>
+            <td><img src="imgs/empty.png" id="tile15" ></td>
+          </tr>
+          <tr>
+            <td><img src="imgs/empty.png" id="tile16" ></td>
+            <td><img src="imgs/empty.png" id="tile17" ></td>
+            <td><img src="imgs/empty.png" id="tile18" ></td>
+            <td><img src="imgs/empty.png" id="tile19" ></td>
+            <td><img src="imgs/empty.png" id="tile20" ></td>
+          </tr>
+          <tr>
+            <td><img src="imgs/empty.png" id="tile21" ></td>
+            <td><img src="imgs/empty.png" id="tile22" ></td>
+            <td><img src="imgs/empty.png" id="tile23" ></td>
+            <td><img src="imgs/empty.png" id="tile24" ></td>
+            <td><img src="imgs/empty.png" id="tile25" ></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="help" id="help">
+        <h3 id="turnIndicator" style="position: absolute; left: -55vw; font-size: 2.5vh"></h3>
+        <button id="leaveRoomInGame" onclick="leaveRoom()" style="position: absolute; top: 1vh; left: -12vw; font-size: 1vw; padding: 2vh">Leave room</button>
+        <h2 id="helpTrigger">Help</h2>
+        <ul id="helpList">
+          <li>Playing cards</li>
+          <li>Move phase</li>
+          <li>Explore phase</li>
+          <li>Combat phase</li>
+          <li>Combat rules</li>
+          <li>Combat rewards</li>
+          <li>Discard phase</li>
+          <li>Domination</li>
+          <li>End</li>
+          <li>Others</li>
+        </ul>
+        <div class="container" id="container">
+          <p></p>
+        </div>
+      </div>
+
+      <script>
+
+        document.getElementById("container").style.display = "none";
+        document.getElementById("helpTrigger").addEventListener("click", function() {
+          if(document.getElementById("helpList").style.display === "block"){
+            document.getElementById("helpList").style.display = "none";
+            document.getElementById("container").style.display = "none";
+          }else{
+            document.getElementById("helpList").style.display = "block";
+          }
+        });
+
+        let listItems = document.querySelectorAll("#helpList li");
+        listItems.forEach(item => {
+          item.addEventListener("click", function() {
+            if(document.getElementById("container").style.display === "none"){
+              document.getElementById("container").style.display = "block";
+            }
+            else if(document.getElementById("container").textContent === ""){
+              document.getElementById("container").style.display = "none";
+            }
+            let container = document.querySelector(".container");
+            if(item.textContent === "Playing cards"){
+              container.innerHTML = "<p>Drag and drop units into your base or adjecent to your locations. Units cost a price displayed in their top left corner.</p>";
+            }else if(item.textContent === "Move phase"){
+              container.innerHTML = "<p>Move up to three cards on the board by clicking on them and then clicking on an available adjacent tile. If card has RAPTURE, you can switch it with any of your cards.</p>";
+            }else if(item.textContent === "Explore phase"){
+              container.innerHTML = "<p>Drag and drop locations adjecent to your units (cant place them in your base). On click you can flip them and activate their ability. They protect you, if they are not flipped</p>";
+            }else if(item.textContent === "Combat phase"){
+              container.innerHTML = "<p>Select up to three combats by dragging a target onto oponents cards. Then choose attackers for every target and see the results. You can place a target on an adjecent unit, if not RANGED.</p>";
+            }else if(item.textContent === "Combat rules"){
+              container.innerHTML = "<p>If sum of all attackers attack is bigger then targets defense, you wound the unit. If its twice or more bigger, you kill the unit. If its the same, player with FEROCITY winns, or nothing happens.</p>";
+            }else if(item.textContent === "Combat rewards"){
+              container.innerHTML = "<p>For a won combat you get +2 sources and oponents gets -2. Nothing happens on a draw and if you destroy a location. For a killed unit/location you get X sources, acording to the price of the card.</p>";
+            }else if(item.textContent === "Discard phase"){
+              container.innerHTML = "<p>On click discard cards you dont like, draw to 6 from the library then by clicking on it. Then you get X sources +1 for every row or a column you control. (see Domination)</p>";
+            }else if(item.textContent === "Domination"){
+              container.innerHTML = "<p>Domination is counted by every row and column, where you get 1 source for every line where you have more cards then your oponent. Locations count for two. INCOME +1 gets you more points for dominated lanes.</p>";
+            }else if(item.textContent === "End"){
+              container.innerHTML = "<p>Winner is the person that gets 30 sources first, or gets oponent to 0. If there are no more cards in your library, you have to play only with the rest of the cards left.</p>";
+            }else if(item.textContent === "Others"){
+              container.innerHTML = "<p>You can see the cards close-ups when you hover on them. INFECT gives every oponent adjacent tile a wound at the start of Combat Phase. SENTINEL limits the amount of units that can attack to 2.</p>";
+            }
+          });
+          
+        });
+      </script>
+
+      <div class="hand" id="hand">
+
+      </div>
+
+      <div class="library" id="deckHolder">
+        <img src="" id="library">
+        <h3 style="position: absolute; top: 13vh; left: 2.2vh;">LIBRARY</h3>
+        <img src="" id="grave">
+        <h3 style="position: absolute; top: 13vh; left: 18.5vh;">GRAVE</h3>
+        <button id="disableHand" style="position: absolute; top: -7vh; left: 5vh; font-size: 2vh; padding: 2vh">Hide/Show hand</button>
+      </div>
+
+      <script>
+        document.getElementById("disableHand").addEventListener("click", function() {
+          console.log(document.getElementById("hand").style.display);
+          if(document.getElementById("hand").style.display === "block"){
+            document.getElementById("hand").style.display = "none";
+          }else{
+            document.getElementById("hand").style.display = "block";
+          }
+        });
+      </script>
+
+      <div class="next">
+        <button id="nextButton" style="display: none;"></button>
+      </div>
+
+      <div class="targets" id="targets">
+        <img src="imgs/target1.png" alt="Target" id="target1">
+        <img src="imgs/target2.png" alt="Target" id="target2">
+        <img src="imgs/target3.png" alt="Target" id="target3">
+      </div>
+
+      <div class="check">
+        <img src="imgs/empty.png" alt="Check" id="checkImg">
+        <div class="checkCircle" id="attack">
+          <img src="imgs/blank.png">
+          <p>A</p>
+        </div>
+
+        <div class="checkCircle" id="cost">
+          <img src="imgs/blank.png" >
+          <p>C</p>
+        </div>
+
+        <div class="checkCircle" id="vitality">
+          <img src="imgs/blank.png">
+          <p>V</p>
+        </div>
+
+        <div class="checkCircle" id="defend">
+          <img src="imgs/blank.png">
+          <p>D</p>
+        </div>
+      </div>
+
+      <div class="endScreen" id="endScreen">
+        <h1>Game Over</h1>
+        <p id="endMessage"></p>
+        <button id="leaveRoomButton" onclick="leaveRoom()">Leave Room</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomId = urlParams.get('roomId');
+
+    const socket = io();
+    let team = "";
+    let deckColor = "";
+    let hand = [];
+    let library = [];
+    let grave = [];
+    //order: 0-units, 1-locations, 2-anytime, 3-main, 4-move, 5-combat, 6-discard
+    let canPlay = [false, false, false, false, false, false, false];
+    let playableUnitTiles = [];
+    let playableLocationTiles = [];
+    let oponentDeck = [];
+    let realDeck = [];
+    let sources = 15;
+    let oponentSources = 15;
+    let moveCount = 0;
+    let targetedIds = [undefined, undefined, undefined];
+    let resolvedCombatNum = 0;   
+    let attackersIds = []; 
+    let resolvingCombat = false;
+    let isSecond = false;
+    let referDeck = [];
+    let referOponentDeck = [];
+    let controlledAtributes = [];
+    let hurtUnits = 0;
+    let rapture;
+    let isLeavingThroughButton = false;
+
+    // pripojeni do mistnosti
+    socket.emit('joinRoom', roomId);
+
+    // odchod z mistnosti
+    function leaveRoom(){
+      isLeavingThroughButton = true;
+      socket.emit('leaveRoom', roomId);
+      window.location.href = 'index.html';
+    }
+
+    window.addEventListener('beforeunload', (event) => {
+      if (!isLeavingThroughButton) {
+        const confirmationMessage = 'Are you sure you want to leave?';
+        event.returnValue = confirmationMessage; 
+        return confirmationMessage; 
+      }
+    });
+
+    // user disconnect
+    socket.on('userDisconnected', (message) => {
+      console.log("halo");
+      const notification = document.getElementById('notification');
+      isLeavingThroughButton = true;
+      
+      notification.textContent = message;
+      alert(message); 
+      socket.disconnect();
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 3000); 
+    });
+
+    // console log ze serveru
+    socket.on('error', (error) => {
+        console.error('Error:', error.message);
+    });
+
+    // set up hraciho pole
+    socket.on('bothUsersReady', (message) => {
+      console.log("bothUsersReady");
+      document.getElementById('ui').style.display = "block";
+      document.getElementById('getReady').style.display = "none";
+
+      //coin flip result, ui setup
+      if(message === "paws"){
+        document.getElementById('avatar').src = "imgs/coinPaws.png";
+        document.getElementById('oponentAvatar').src = "imgs/coinTails.png";
+        team = "paws";
+        const tdElements = document.querySelectorAll('td');
+        tdElements.forEach(td => {
+          td.style.transform = 'rotate(270deg)';
+        });
+
+        playableUnitTiles.push(document.getElementById('tile5'));
+        playableUnitTiles.push(document.getElementById('tile10'));
+        playableUnitTiles.push(document.getElementById('tile15'));
+        playableUnitTiles.push(document.getElementById('tile20'));
+        playableUnitTiles.push(document.getElementById('tile25'));
+      }else{
+        document.getElementById('avatar').src = "imgs/coinTails.png";
+        document.getElementById('oponentAvatar').src = "imgs/coinPaws.png";
+        team = "tails";
+        
+        playableUnitTiles.push(document.getElementById('tile1'));
+        playableUnitTiles.push(document.getElementById('tile6'));
+        playableUnitTiles.push(document.getElementById('tile11'));
+        playableUnitTiles.push(document.getElementById('tile16'));
+        playableUnitTiles.push(document.getElementById('tile21'));
+      }
+      
+    });
+    // vytahnuti specialnich abilit z databaze
+    function parseAbilities(){
+    realDeck.forEach(card => {
+      if(card.abilities){
+        let abilities = card.abilities.split(", ");
+        card.abilities = abilities;
+      }
+      if(card.special_abilities){
+        let specialAbilities = card.special_abilities.split(", ");
+        card.special_abilities = specialAbilities;
+      }
+    });
+    console.log(realDeck);
+  }
+    // los na zacatek
+    socket.on("flipCoin", (winningSide) => {
+      const coinImage = document.getElementById('coinImage');
+      coinImage.src = "imgs/coinPaws.png"; 
+      let isPaws = true;
+      coinImage.style.animation = 'coinFlip 0.5s infinite';
+
+      const flipInterval = setInterval(() => {
+          coinImage.src = isPaws ? "imgs/coinTails.png" : "imgs/coinPaws.png";
+          isPaws = !isPaws;
+      }, 500);
+
+      setTimeout(() => {
+        clearInterval(flipInterval);
+        const result = winningSide === "paws" ? "Paws" : "Tails";
+        coinImage.src = winningSide === "paws" ? "imgs/coinPaws.png" : "imgs/coinTails.png";
+        coinImage.style.animation = 'none'; 
+        coinImage.style.transition = 'none';
+        coinImage.style.transform = 'rotateY(0deg)';
+        if(winningSide === team){
+          document.getElementById('winnerChoiceButtons').style.display = "block";
+        }
+      }, 3000);
+  });
+  // vybirani balicku
+function pick(choice){
+    console.log(choice);
+    if(choice === "orange"){
+      deckColor = "orange";
+      choice = "black";
+      document.getElementById('library').src = "imgs/sleeve.png";
+      document.getElementById('grave').src = "imgs/sleeve.png";
+      document.getElementById('deckHolder').style.display = "block";
+    }else if(choice === "black"){
+      deckColor = "black";
+      choice = "orange";
+      document.getElementById('library').src = "imgs/sleeve.png";
+      document.getElementById('grave').src = "imgs/sleeve.png";
+      document.getElementById('deckHolder').style.display = "block";
+    }
+
+    if(window.getComputedStyle(document.getElementById('startFirstButton')).display === "inline-block" && window.getComputedStyle(document.getElementById('pickOrangeButton')).display === "inline-block"){
+      document.getElementById('winnerChoiceButtons').style.display = "none";
+      socket.emit("winnersChoice", choice, roomId);
+    }else if(choice !== "start"){
+      document.getElementById('winnerChoiceButtons').style.display = "none";
+      socket.emit("loosersChoiceServer", choice, roomId);
+    }
+    else{
+      document.getElementById('winnerChoiceButtons').style.display = "none";
+      socket.emit("getDeck", deckColor, roomId);
+    }
+  }
+  // vybirani balicku
+  socket.on("loosersChoice", (choice) => {
+    document.getElementById('winnerChoiceButtons').style.display = "inline-block";
+    if(choice === "deck"){
+      document.getElementById('startFirstButton').style.display = "none";
+    }
+    else if(choice === "orange"){
+      document.getElementById('pickOrangeButton').style.display = "none";
+      document.getElementById('pickBlackButton').style.display = "none";
+      deckColor = "black";
+      document.getElementById('library').src = "imgs/sleeve.png";
+      document.getElementById('grave').src = "imgs/sleeve.png";
+      document.getElementById('deckHolder').style.display = "block";
+    }else if(choice === "black"){
+      document.getElementById('pickOrangeButton').style.display = "none";
+      document.getElementById('pickBlackButton').style.display = "none";
+      deckColor = "orange";
+      document.getElementById('library').src = "imgs/sleeve.png";
+      document.getElementById('grave').src = "imgs/sleeve.png";
+      document.getElementById('deckHolder').style.display = "block";
+    }
+
+  });
+  // vybirani balicku
+  socket.on("winnersDeck", (deck) => {
+    console.log(deck);
+    deckColor = deck;
+    socket.emit("getDeck", deckColor, roomId);
+    document.getElementById('library').src = "imgs/sleeve.png";
+    document.getElementById('grave').src = "imgs/sleeve.png";
+    document.getElementById('deckHolder').style.display = "block";
+  });
+  // zamichani decku
+  function shuffleArray(array) {
+    // Fisher-Yates shuffle
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]]; 
+    }
+  }
+  // mulligan
+  socket.on("mulligan", (pulledDeck) => {
+    document.getElementById('coinFlipDiv').style.display = "none";
+    document.getElementById('mulligan').style.display = "block";
+
+    //preformatovani balicku aby kazda karta mela sve vlastni id
+    pulledDeck.forEach(card => {
+      for (let i = 0; i < card.amount; i++) {
+        let cardCopy = { ...card }; 
+        if (i > 0) {
+          cardCopy.id = card.id + "copy" + i; 
+        }
+        else {
+          cardCopy.id = String(card.id);
+        }
+        realDeck.push(cardCopy);
+      }
+    });
+    library = [...realDeck];
+    console.log("real deck " + library);
+    shuffleArray(library);
+    for(let i = 0; i < 6; i++){
+      drawCard();
+    }
+    console.log("hand " + hand);
+  });
+  // realny mulligan
+function actualMulligan(isMulligan){
+    if(isMulligan){
+      const handCopy = [...hand];
+      handCopy.forEach(card => {
+        console.log(card);
+        const cardToReturn = hand.pop();
+        if (!library.some(existingCard => existingCard.id === cardToReturn.id)) {
+          library.push(cardToReturn);
+        }
+      });
+      const handElement = document.getElementById('hand');
+      while (handElement.firstChild) {
+        handElement.removeChild(handElement.firstChild);
+      }
+      console.log("hand " + hand);
+      console.log(library);
+      shuffleArray(library);
+      for(let i = 0; i < 6; i++){
+        drawCard();
+      }
+    }
+    parseAbilities();
+    referDeck = JSON.parse(JSON.stringify(realDeck));
+    socket.emit("sendDeck", realDeck, roomId);
+    document.getElementById('mulligan').style.display = "none";
+    socket.emit("mulligan", roomId);
+  }
+  // zahajeni hry
+  socket.on("start", () => {
+    firstPhase(true);
+  });
+  socket.on("start2", () => {
+    document.getElementById("turnIndicator").innerHTML = "Oponents turn";
+  });
+  // vytahnuti oponentova decku
+  socket.on("oponentDeck", (deck) => {
+    console.log(deck);
+    oponentDeck = [...deck];
+    referOponentDeck = JSON.parse(JSON.stringify(oponentDeck));
+  });
+  // vymazani vsech listeneru z objektu
+function removeAllEventListeners(element) {
+    if (element && element.parentNode) {
+      const clone = element.cloneNode(true);
+      element.parentNode.replaceChild(clone, element);
+    } 
+  }
+  // prvni faze - pokladani jednotek
+function firstPhase(isFirst){
+    //isFirst checkuje zda je zahájení fáze poprvé za kolo
+    if(isFirst){
+      document.getElementById('turnIndicator').innerHTML = "Its your turn";
+      let allLocations = document.querySelectorAll(".filled-zone");
+      allLocations.forEach(location =>{
+        if(location.getAttribute("data-card-type") == "location" && location.getAttribute("isFliped")){
+          let locationCard = realDeck.find(card => card.id === location.getAttribute("data-card-id"));
+          if(!locationCard){
+            locationCard = oponentDeck.find(card => card.id === location.getAttribute("data-card-id"));
+          }
+          location.src = locationCard.img_url;
+          location.setAttribute("isFliped", false);
+          socket.emit("flipLocation", roomId, location.getAttribute("data-card-id"),false);
+        }
+        else if(location.getAttribute("data-card-type") == "unit" && location.getAttribute("data-card-race") == deckColor){
+          location.setAttribute("canMove", true);
+          let realCard = realDeck.find(card => card.id === location.getAttribute("data-card-id"));
+          let referCard = referDeck.find(card => card.id === location.getAttribute("data-card-id"));
+          if(referCard.abilities && referCard.abilities.includes("RAPTURE")){
+            if(realCard.abilities){
+              realCard.abilities.push("RAPTURE");
+            }
+            else{
+              realCard.abilities = ["RAPTURE"];
+            }
+          }
+        }
+      });
+    }
+
+    document.getElementById("hand").style.display = "block";
+    recountCosts();
+    console.log("firstPhase");
+    console.log(oponentDeck)
+    moveCount = 0;
+    console.log(moveCount);
+    canPlay = [true, false, true, true, false, false, false];
+    document.getElementById("nextButton").style.display = "inline-block";
+    removeAllEventListeners(document.getElementById("nextButton"));
+    document.getElementById("nextButton").addEventListener('click', () => {
+      movePhase();
+    });
+    document.getElementById("nextButton").innerHTML = "Move phase";
+  }
+  // polozeni karty a cela jeji funkcionalita
+  let dropZones = [];
+  function findDropZones() {
+    let newDropZones = document.querySelectorAll('.drop-zone');
+    newDropZones.forEach(zone => {
+      if (!dropZones.includes(zone)) {
+        dropZones.push(zone);
+      }
+    }); 
+
+    dropZones.forEach(zone => {
+      let actualZone = document.getElementById(zone.id);
+      actualZone.addEventListener('dragover', handleDragOver);
+      actualZone.addEventListener('drop', handleDrop);
+    });
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    }
+
+    //polozeni karty
+    function handleDrop(event) {
+      event.preventDefault();
+      const cardId = event.dataTransfer.getData('text/plain');
+      const cardElement = document.getElementById(cardId);
+      const cardCost = realDeck.find(card => card.id === cardId).price;
+      hand = hand.filter(card => card.id !== cardId);
+      
+      sources -= cardCost;
+      document.getElementById('sources').textContent = sources;
+
+      this.src = cardElement.src;
+      this.setAttribute('data-card-id', cardId); 
+      this.setAttribute("data-card-race", cardElement.getAttribute("data-card-race"));
+      this.setAttribute("data-card-type", cardElement.getAttribute("data-card-type"));
+    
+      cardElement.remove();
+      this.className = 'filled-zone';
+      if(dropZones.some(zone => zone.id === this.id)){
+        dropZones = dropZones.filter(zone => zone.id !== this.id);
+      } 
+      if(playableUnitTiles.some(tile => tile.id === this.id)){
+        playableUnitTiles = playableUnitTiles.filter(tile => tile.id !== this.id);
+      }
+      this.draggable = false;
+      this.style.opacity = '1';
+      this.setAttribute("canMove", true);
+
+      const placedCard = realDeck.find(card => card.id === cardId);
+
+      if(controlledAtributes.length > 0){
+        controlledAtributes.forEach(atr => {
+          if(placedCard.abilities && !placedCard.abilities.includes(atr)){
+            if(placedCard.abilities.length > 0){
+              placedCard.abilities.push(atr);
+            }
+            else{
+              placedCard.abilities = [atr];
+            }
+          }
+          else{
+            placedCard.abilities = [atr];
+          }
+          if(atr === "ATTACKPLUSONE"){
+            placedCard.attack += 1;
+          }
+          if(atr === "DEFENSEPLUSONE"){
+            placedCard.defense += 1;
+          }
+        });
+      }
+      
+
+      let controlledAbility;
+      if(placedCard.special_abilities && placedCard.special_abilities.includes("ControlledFerocity")){
+        controlledAbility = "FEROCITY";
+      }
+      else if(placedCard.special_abilities && placedCard.special_abilities.includes("ControlledDamagePlusOne")){
+        controlledAbility = "DAMAGEPLUSONE";
+      }
+      else if(placedCard.special_abilities && placedCard.special_abilities.includes("ControlledInfect")){
+        controlledAbility = "INFECT";
+      }
+      else if(placedCard.special_abilities && placedCard.special_abilities.includes("ControlledAttackPlusOne")){
+        controlledAbility = "ATTACKPLUSONE";
+      }
+      else if(placedCard.special_abilities && placedCard.special_abilities.includes("ControlledDefensePlusOne")){
+        controlledAbility = "DEFENSEPLUSONE";
+      }
+
+      if(controlledAbility != undefined){
+        controlledAtributes.push(controlledAbility);
+        const cardsOnTable = document.querySelectorAll(".filled-zone");
+        cardsOnTable.forEach(card => {
+          if(card.getAttribute("data-card-race") == deckColor){
+            if(card.getAttribute("data-card-type") === "unit"){
+              let realCard = realDeck.find(cardObj => cardObj.id === card.getAttribute("data-card-id"));
+              if(realCard.abilities){
+                if(!realCard.abilities.includes(controlledAbility)){
+                  realCard.abilities.push(controlledAbility);
+                }
+              }
+              else{
+                realCard.abilities = [controlledAbility];
+              }
+              if(controlledAbility === "ATTACKPLUSONE"){
+                realCard.attack += 1;
+              }
+              if(controlledAbility === "DEFENSEPLUSONE"){
+                realCard.defense += 1;
+              }
+            }
+          }
+        });
+      }
+
+      if(cardElement.getAttribute("data-card-type") != "location"){
+        let cardsOnTable = document.querySelectorAll(".filled-zone");
+        for (let card of cardsOnTable) {
+          if(card.getAttribute("data-card-race") == deckColor && card.getAttribute("data-card-type") == "location" && card.getAttribute("isFliped") != "true"){
+            let cardInDeck = realDeck.find(deckCard => deckCard.id === card.getAttribute("data-card-id"));
+            if(cardInDeck && cardInDeck.special_abilities && cardInDeck.special_abilities.includes("Hurt1")){
+              console.log("hurt1");
+              hurtPhase(1, false);
+            }
+          }
+        }
+      }
+
+      if(placedCard.abilities && placedCard.abilities.includes("ONETURNCOST")){
+        const handCards = document.querySelectorAll('#hand img');
+        handCards.forEach(card => {
+          let cardInDeck = realDeck.find(deckCard => deckCard.id === card.id);
+          if(cardInDeck){
+            cardInDeck.price += 2;
+          }
+          if(cardInDeck.abilities){
+            cardInDeck.abilities = cardInDeck.abilities.filter(ability => ability !== "ONETURNCOST");
+          }
+        });
+      }
+
+      socket.emit("updateDeck", roomId, realDeck);
+
+      socket.emit("addCardToBoard", roomId, this.src, this.parentNode.parentNode.rowIndex, this.parentNode.cellIndex, this.getAttribute("data-card-id"), cardCost, this.getAttribute("data-card-type"), this.getAttribute("data-card-race"), realDeck);
+
+      this.style.boxShadow = 'inset 0 0 0 0.3vw white';
+      if(this.getAttribute("data-card-type") === "location"){
+        findMovableTiles(this).forEach(tile => {
+          if(!playableUnitTiles.includes(tile)){
+            playableUnitTiles.push(tile);
+          }
+        });
+      }
+     
+      let saveParent = this.parentNode;
+      removeAllEventListeners(this);
+      addHoverEffectToTableCards();
+      if(placedCard.type === "unit"){
+        saveParent.firstChild.addEventListener('click', onMoveClick);      
+      }
+      else{
+        saveParent.firstChild.addEventListener('click', onLocationClick);
+        saveParent.firstChild.setAttribute("isFliped", "false");
+      }
+      recountCosts();
+    }
+
+    //flip lokace
+    function onLocationClick(event){
+      event.preventDefault();
+      let locationCard = realDeck.find(card => card.id === this.getAttribute("data-card-id"));
+      if(this.getAttribute("isFliped") === "false" && sources > 2 && !canPlay[5]){
+        this.src = "imgs/sleeve.png";
+        sources -= 2;
+        updateSources();
+        this.setAttribute("isFliped", true);
+        socket.emit("flipLocation", roomId, this.getAttribute("data-card-id"), true);
+
+        if(locationCard.abilities && locationCard.abilities.includes("TurnPlusTwoDefense") && canPlay[2]){
+          console.log("turnPlusTwoDefense");
+          oneTurnEffect("TurnPlusTwoDefense");
+        }
+        else if(locationCard.abilities && locationCard.abilities.includes("TurnMinusTwoCost") && canPlay[0]){
+          const handCards = document.querySelectorAll('#hand img');
+          handCards.forEach(card => {
+            let cardInDeck = realDeck.find(deckCard => deckCard.id === card.id);
+            if(cardInDeck){
+              cardInDeck.price -= 2;
+            }
+            if(cardInDeck.abilities){
+              cardInDeck.abilities.push("ONETURNCOST");
+            }
+            else{
+              cardInDeck.abilities = ["ONETURNCOST"];
+            }
+          });
+        }
+
+      }
+    }
+
+    //move moznosti
+    function onMoveClick(event){
+      event.preventDefault();
+      if(canPlay[4] && this.getAttribute("data-card-type") === "unit" && moveCount < 3){
+        console.log("clicked");
+        if(this.clicked){
+          this.clicked = false;
+          let cardReal = realDeck.find(card => card.id === this.getAttribute("data-card-id"));
+          if(cardReal.abilities && cardReal.abilities.includes("RAPTURE")){
+            rapture = this.id;
+          }
+          findMovableTiles(this).forEach(tile => {
+            tile.style.boxShadow = 'inset 0 0 0 0.3vw white';
+            if (tile.moveToTileListener) {
+              tile.removeEventListener('click', tile.moveToTileListener);
+              delete tile.moveToTileListener; 
+            } 
+          });
+        }
+        else{
+          triggerClickedTile();
+          this.clicked = true;
+          if(rapture != undefined){
+            raptureSwitch(this.id);
+          }
+          else if(this.getAttribute("canMove") === "true"){
+            findMovableTiles(this).forEach(tile => {
+              tile.style.boxShadow = 'inset 0 0 0 0.3vw green';
+              tile.moveToTileListener = moveToTile.bind(this);
+              tile.addEventListener('click', tile.moveToTileListener); // Bind the correct context
+            });
+          }
+        }
+      }
+    }
+
+    //move karty
+    function moveToTile(event){
+      event.preventDefault();
+      moveCount++;
+      findMovableTiles(this).forEach(tile => {
+        tile.style.boxShadow = 'inset 0 0 0 0.3vw white';
+        if (tile.moveToTileListener) {
+          tile.removeEventListener('click', tile.moveToTileListener);
+          delete tile.moveToTileListener;
+        }
+      });
+      
+      event.target.setAttribute("data-card-id", this.getAttribute("data-card-id"));
+      event.target.setAttribute("data-card-race", this.getAttribute("data-card-race"));
+      event.target.setAttribute("data-card-type", this.getAttribute("data-card-type"));
+      event.target.setAttribute("canMove", false);
+      this.removeAttribute("canMove");
+      this.removeAttribute("data-card-id");
+      this.removeAttribute("data-card-race");
+      this.removeAttribute("data-card-type");
+      event.target.src = this.src;
+      event.target.className = 'filled-zone';
+      if(dropZones.some(zone => zone.id === event.target.id)){
+        dropZones = dropZones.filter(zone => zone.id !== event.target.id);
+      } 
+      if(playableUnitTiles.some(tile => tile.id === event.target.id)){
+        playableUnitTiles = playableUnitTiles.filter(tile => tile.id !== event.target.id);
+      }
+      if(this.parentNode.cellIndex === 0 && team === "tails"){
+        playableUnitTiles.push(this);
+      }
+      else if(this.parentNode.cellIndex === 4 && team === "paws"){
+        playableUnitTiles.push(this);
+      }
+
+      let directions = [
+        { row: -1, col: 0 }, // up
+        { row: 1, col: 0 },  // down
+        { row: 0, col: -1 }, // left
+        { row: 0, col: 1 }   // right
+      ];
+
+      directions.forEach(direction => {
+        let newRow = this.parentNode.parentNode.rowIndex + direction.row;
+        let newCol = this.parentNode.cellIndex + direction.col;
+        let newTile = document.querySelector(`table tr:nth-child(${newRow + 1}) td:nth-child(${newCol + 1}) img`);
+        if(newTile && newTile.classList.contains("filled-zone") && newTile.getAttribute("data-card-type") === "location" && newTile.getAttribute("data-card-race") === deckColor){
+            playableUnitTiles.push(this);
+          }
+        }
+      );
+      
+      this.className = "";
+      let saveParent = event.target.parentNode;
+      
+      this.src = "imgs/empty.png";
+      socket.emit("moveOnBoard", roomId, event.target.src, this.parentNode.parentNode.rowIndex, this.parentNode.cellIndex, event.target.parentNode.parentNode.rowIndex, event.target.parentNode.cellIndex);
+      removeAllEventListeners(event.target);
+      removeAllEventListeners(this);
+      saveParent.firstChild.addEventListener('click', onMoveClick);
+      saveParent.firstChild.clicked = false;
+      addHoverEffectToTableCards();
+    }
+  }
+  // prepocitani cen karet
+  function recountCosts(){
+    const handCards = document.querySelectorAll('#hand img');
+    handCards.forEach(card => {
+      const cardData = realDeck.find(deckCard => deckCard.id === card.id);
+      if(cardData.special_abilities && cardData.special_abilities.includes("LessCostForControl")){
+        console.log("less cost for control");
+        let cardsOnBoard = Array.from(document.querySelectorAll('.filled-zone')); 
+        cardsOnBoard = cardsOnBoard.filter(cardOnBoard => cardOnBoard.getAttribute("data-card-race") === deckColor && cardOnBoard.getAttribute("data-card-type") === "unit");
+        const referenceCard = referDeck.find(deckCard => deckCard.id === card.id);
+        cardData.price = referenceCard.price - cardsOnBoard.length;
+      }
+
+    });
+
+    addHoverEffectToTableCards();
+  }
+  // druha faze - pohyb
+function movePhase(){
+    console.log("movePhase");
+    document.getElementById("hand").style.display = "none";
+    canPlay = [false, false, true, true, true, false, false];
+    removeAllEventListeners(document.getElementById("nextButton"));
+    document.getElementById("nextButton").addEventListener('click', () => {
+      explorePhase();
+    });
+    document.getElementById("nextButton").innerHTML = "Explore phase";
+  }
+  // zezelenani poli kam muze hrac dat kartu
+  function makeTilesPlayable(shouldMakePlayable, whatTiles) {
+      dropZones.forEach(zone => {
+        zone.className = "";
+        removeAllEventListeners(zone);
+      });
+      dropZones = [];
+
+      console.log(shouldMakePlayable, whatTiles, playableUnitTiles);
+      if(shouldMakePlayable && whatTiles === "unit"){
+        playableUnitTiles.forEach(tile => {
+          let actualTile = document.getElementById(tile.id);
+          actualTile.style.boxShadow = 'inset 0 0 0 0.3vw green';
+          actualTile.className = "drop-zone";
+        });
+      }else if(shouldMakePlayable && whatTiles === "location"){
+        playableLocationTiles = findFreeLocationTiles();
+        playableLocationTiles.forEach(tile => {
+          let actualTile = document.getElementById(tile.id);
+          actualTile.style.boxShadow = 'inset 0 0 0 0.3vw green';
+          actualTile.className = "drop-zone";
+        });
+      }
+      else if(!shouldMakePlayable && whatTiles === "unit"){
+        playableUnitTiles.forEach(tile => {
+          let actualTile = document.getElementById(tile.id);
+          actualTile.style.boxShadow = 'inset 0 0 0 0.3vw white';
+        });
+      }else if(!shouldMakePlayable && whatTiles === "location"){
+        playableLocationTiles.forEach(tile => {
+          let actualTile = document.getElementById(tile.id);
+          actualTile.style.boxShadow = 'inset 0 0 0 0.3vw white';
+        });
+        playableLocationTiles = [];
+      }
+      findDropZones();
+    }
+    // prohozani karet na specialni abilitu
+  function raptureSwitch(switchedElementId){
+    let switchedElement = document.getElementById(switchedElementId);
+    let raptureElement = document.getElementById(rapture);
+    socket.emit("switch", roomId, rapture, switchedElementId);
+
+    let raptureCard = realDeck.find(card => card.id === raptureElement.getAttribute("data-card-id"));
+    raptureCard.abilities = raptureCard.abilities.filter(ability => ability !== "RAPTURE");
+    let saveUrl = switchedElement.src;
+    switchedElement.src = raptureElement.src;
+    raptureElement.src = saveUrl;
+    let saveId = switchedElement.getAttribute("data-card-id");
+    switchedElement.setAttribute("data-card-id", raptureElement.getAttribute("data-card-id"));
+    raptureElement.setAttribute("data-card-id", saveId);
+    switchedElement.clicked = false;
+    rapture = undefined;
+    let saveMove = switchedElement.getAttribute("canMove");
+    switchedElement.setAttribute("canMove", raptureElement.getAttribute("canMove"));
+    raptureElement.setAttribute("canMove", saveMove);
+  }
+  // passnuti prohozani
+  socket.on("switch", (raptureId, switchedId) => {
+    let switchedElement = document.getElementById(switchedId);
+    let raptureElement = document.getElementById(raptureId);
+
+    let raptureCard = oponentDeck.find(card => card.id === raptureElement.getAttribute("data-card-id"));
+    raptureCard.abilities = raptureCard.abilities.filter(ability => ability !== "RAPTURE");
+    let saveUrl = switchedElement.src;
+    switchedElement.src = raptureElement.src;
+    raptureElement.src = saveUrl;
+    let saveId = switchedElement.getAttribute("data-card-id");
+    switchedElement.setAttribute("data-card-id", raptureElement.getAttribute("data-card-id"));
+    raptureElement.setAttribute("data-card-id", saveId);
+  });
+  // treti faze - pokladani lokaci
+  function explorePhase(){
+    rapture = undefined;
+    document.getElementById("hand").style.display = "block";
+    triggerClickedTile();
+    console.log("explorePhase");
+    canPlay = [false, true, true, true, false, false, false];
+    removeAllEventListeners(document.getElementById("nextButton"));
+    document.getElementById("nextButton").addEventListener('click', () => {
+      combatPhase();
+    });
+    document.getElementById("nextButton").innerHTML = "Combat phase";
+  }
+  // zjisteni kam muzu polozit lokace
+  function findFreeLocationTiles(){
+    const table = document.getElementById('board'); 
+    const tiles = table.getElementsByTagName('td');
+    let freeTiles = [];
+
+    for (let tile of tiles) {
+      if (tile.firstChild.getAttribute("data-card-race") === deckColor && tile.firstChild.getAttribute("data-card-type") === "unit") {
+        findMovableTiles(tile.firstChild).forEach(tile => {
+          freeTiles.push(tile);
+        });
+      }
+    }
+
+    if(team == "tails"){
+      freeTiles = freeTiles.filter(tile => tile.parentNode.cellIndex != 0);
+    }
+    else{
+      freeTiles = freeTiles.filter(tile => tile.parentNode.cellIndex != 4);
+    }
+
+    return freeTiles;
+  }
+  // ctvrta faze - boj
+  function combatPhase(){
+    console.log("combatPhase");
+    canPlay = [false, false, false, true, false, true, false];
+    findAllTargetables();
+    //isSecond urcuje zda je hracuv kombat mimo nebo v jeho kole
+    if(!isSecond){
+      let units = document.querySelectorAll(".filled-zone");
+      units.forEach(unit => {
+        let card = realDeck.find(card => card.id === unit.getAttribute("data-card-id"));
+        if(!card){
+          card = oponentDeck.find(card => card.id === unit.getAttribute("data-card-id"));
+        }
+        //infect
+        if(card && card.abilities && card.abilities.includes("INFECT")){
+          console.log(card);
+          let currentRow = unit.parentNode.parentNode.rowIndex;
+          let currentCol = unit.parentNode.cellIndex;
+          let directions = [
+            { row: -1, col: 0 }, 
+            { row: 1, col: 0 }, 
+            { row: 0, col: -1 }, 
+            { row: 0, col: 1 }   
+          ];
+          directions.forEach(direction => {
+            let newRow = currentRow + direction.row;
+            let newCol = currentCol + direction.col;
+            let newTile = document.querySelector(`table tr:nth-child(${newRow + 1}) td:nth-child(${newCol + 1}) img`);
+            if(newTile && newTile.classList.contains("filled-zone")){
+              console.log(newTile);
+              let newCard = oponentDeck.find(cardIn => cardIn.id === newTile.getAttribute("data-card-id"));
+              if(!newCard){
+                newCard = realDeck.find(cardIn => cardIn.id === newTile.getAttribute("data-card-id"));
+              }
+              if(newCard && newCard.type === "unit" && newCard.race != "black"){
+                newCard.vitality -= 1;
+                if(newCard.vitality <= 0){
+                  if(newCard.race != deckColor){
+                    sources += newCard.price;
+                  }
+                  else{
+                    oponentSources += newCard.price;
+                  }
+                  updateSources();
+                  removeCard(newTile);
+                }
+                else{
+                  socket.emit("hurt", newCard.id, roomId, newCard.vitality);
+                }
+              }
+            }
+          });
+        }
+      });
+    }
+    removeAllEventListeners(document.getElementById("nextButton"));
+    document.getElementById("targets").style.display = "block";
+    document.getElementById("nextButton").innerHTML = "Next";
+    document.getElementById("nextButton").addEventListener('click', () => {
+      if(isSecond){
+        isSecond = false;
+        removeAllTargetables();
+        addHoverEffectToTableCards();
+        document.getElementById("nextButton").style.display = "none";
+        document.getElementById("targets").style.display = "none";
+        document.getElementById("turnIndicator").innerHTML = "Oponents turn";
+        socket.emit("attackPass", roomId);
+      }
+      else{
+        document.getElementById('turnIndicator').innerHTML = "Oponents turn";
+        isSecond = true;
+        removeAllTargetables();
+        addHoverEffectToTableCards();
+        document.getElementById("nextButton").style.display = "none";
+        document.getElementById("targets").style.display = "none";
+        document.getElementById("turnIndicator").innerHTML = "Oponents turn";
+        socket.emit("attackPass", roomId);
+      }
+    });
+
+    let units = document.querySelectorAll(".filled-zone");
+    let canAttack = false;
+    units.forEach(unit => {
+      if(unit.getAttribute("data-card-race") != deckColor){
+        possibleAttackers = findAllAttackers(unit);
+        if(possibleAttackers.length > 0){
+          canAttack = true;
+        }
+      }
+    });
+
+    if(!canAttack){
+      document.getElementById("nextButton").click();
+    }
+  }
+  // zahajeni boje pokud ze hrac vybere cile
+  function startCombat(){
+    document.getElementById("hand").style.display = "none";
+    removeAllTargetables();
+    addHoverEffectToTableCards();
+    console.log("startCombat");
+    document.getElementById("nextButton").innerHTML = "Confirm attackers";
+    document.getElementById("nextButton").style.backgroundColor = "grey";
+    removeAllEventListeners(document.getElementById("nextButton"));
+    selectAttackers();
+  }
+  // najiti utocniku
+  function findAllAttackers(target){
+    let cards = document.querySelectorAll(".filled-zone"); 
+
+    const currentRow = target.parentNode.parentNode.rowIndex;
+    const currentCol = target.parentNode.cellIndex;
+
+    let movableTiles = [];
+    let badDirections = [];
+
+    const directions = [
+      { row: -1, col: 0 }, // up
+      { row: 1, col: 0 },  // down
+      { row: 0, col: -1 }, // left
+      { row: 0, col: 1 },   // right
+      { row: -2, col: 0 }, // up +1
+      { row: 2, col: 0 },  // down +1
+      { row: 0, col: -2 }, // left +1
+      { row: 0, col: 2 }   // right +1
+    ];
+
+    directions.forEach(direction => {
+      const newRow = currentRow + direction.row;
+      const newCol = currentCol + direction.col;
+      const newZone = document.querySelector(`table tr:nth-child(${newRow + 1}) td:nth-child(${newCol + 1}) img`);
+      if (newZone && newZone.classList.contains('filled-zone')) {
+        if(newZone.getAttribute("data-card-race") === deckColor){
+          if(newZone.getAttribute("data-card-type") === "unit"){
+            if(Math.abs(direction.row) != 2 && Math.abs(direction.col) != 2){
+              movableTiles.push(newZone);
+            }
+            else{
+              let doesHaveRanged = realDeck.find(card => card.id === newZone.getAttribute("data-card-id")).abilities;
+              if(doesHaveRanged){
+                if(doesHaveRanged.includes("RANGED")){
+                  let checkBeforeDirection;
+                  if(Math.abs(direction.row) === 2){
+                    checkBeforeDirection = { row: direction.row / 2, col: 0 };
+                  }
+                  else{
+                    checkBeforeDirection = { row: 0, col: direction.col / 2 };
+                  }
+
+                  const checkBeforeDirectionStr = JSON.stringify(checkBeforeDirection);
+                  const badDirectionsStr = badDirections.map(dir => JSON.stringify(dir));
+
+                  if(!badDirectionsStr.includes(checkBeforeDirectionStr)){
+                    movableTiles.push(newZone);
+                  }
+                }
+              }
+            }
+          }
+        } 
+        else {
+          if (newZone.getAttribute("data-card-type") === "location") {
+            const isFliped = newZone.getAttribute("isFliped");
+            if (isFliped !== null && isFliped === "false") {
+              badDirections.push(direction);
+            }
+          } else {
+            badDirections.push(direction);
+          }
+        }
+      }
+    });
+
+    console.log(movableTiles);
+    return movableTiles;
+  }
+  // vybrani utocniku
+  function handleClick(event) {
+    let attacker = event.currentTarget;
+    let isSentinel = attacker.isSentinel; 
+    if (attacker.clicked) {
+      // deselect
+      attacker.style.outline = "none";
+      attacker.style.outlineOffset = "0";
+      attacker.clicked = false;
+      if(!resolvingCombat){
+        attackersIds = attackersIds.filter(id => id !== attacker.getAttribute("data-card-id"));
+        if(attackersIds.length === 0){
+          document.getElementById("nextButton").style.backgroundColor = "grey";
+          removeAllEventListeners(document.getElementById("nextButton"));
+        }
+      }
+    } else {
+      // select
+      if((isSentinel && attackersIds.length < 2) || !isSentinel){
+        attacker.style.outline = "0.3vw solid green";
+        attacker.style.outlineOffset = "-0.3vw";
+        attacker.clicked = true;
+        attackersIds.push(attacker.getAttribute("data-card-id"));
+        if(attackersIds.length != 0){
+          document.getElementById("nextButton").style.backgroundColor = "#df5917";
+          document.getElementById("nextButton").addEventListener('click', resolveCombat);
+        }
+      }
+    }
+  }
+  // pridani moznosti pridat utocnika
+  function selectAttackers(){
+    let target = document.getElementById(targetedIds[resolvedCombatNum]);
+    let possibleAttackers = findAllAttackers(target);
+    possibleAttackers.forEach(attacker => {
+      let targetCard = oponentDeck.find(card => card.id === target.getAttribute("data-card-id"));
+      console.log("Target Card:", targetCard);
+      if(targetCard && targetCard.abilities) {
+        console.log("Target Card Abilities:", targetCard.abilities);
+        if(targetCard.abilities.includes("SENTINEL")){
+          console.log("sentinel");
+          attacker.isSentinel = true; 
+        } else {
+          attacker.isSentinel = false; 
+        }
+      } else {
+        attacker.isSentinel = false; 
+      }
+      attacker.addEventListener('click', handleClick);
+    });
+  }
+  // vypocitani boje
+  function resolveCombat(){
+    resolvingCombat = true;
+    triggerClickedTile();
+    console.log(attackersIds);
+    console.log("resolveCombat"); 
+    
+    let target = document.getElementById(targetedIds[resolvedCombatNum]);
+    let targetCard = oponentDeck.find(card => card.id === target.getAttribute("data-card-id"));
+  
+    let totalAttackingPower = 0;
+    let totalDefendingPower = targetCard.defense;
+    let plusDamage = 1;
+
+    if (target.nextSibling) {
+      target.nextSibling.remove();
+    }
+    socket.emit("removeTarget", target.id, roomId);
+
+    attackersIds.forEach(attackerId => {
+      let attacker = realDeck.find(card => card.id === attackerId);
+      if(attacker.abilities && attacker.abilities.includes("DAMAGEPLUSONE")){
+        plusDamage += 1;
+      }
+      if(attacker.abilities && attacker.abilities.includes("DAMAGEPLUSTWO")){
+        plusDamage += 2;
+      }
+    });
+  
+    attackersIds.forEach(attackerId => {
+      let attacker = realDeck.find(card => card.id === attackerId);
+      console.log(attacker.attack);
+      totalAttackingPower += attacker.attack;
+    });
+  
+    if(totalAttackingPower > totalDefendingPower * 2 && targetCard.type === "unit") {
+      console.log("overhelm");
+      //overhelm
+      playCombatGif(target, true);
+      sources += targetCard.price;
+      removeCard(target);
+      sources += 2;
+      oponentSources -= 2;
+      console.log(sources);
+    } else if(totalAttackingPower > totalDefendingPower) {
+      //win
+      console.log("win");
+      playCombatGif(target, true);
+      targetCard.vitality -= plusDamage;
+      if(targetCard.vitality <= 0){
+        sources += targetCard.price;
+        removeCard(target);
+      }
+      else{
+        socket.emit("hurt", targetCard.id, roomId, targetCard.vitality);
+      }
+      sources += 2;
+      oponentSources -= 2;
+      console.log(sources);
+    } else if(totalAttackingPower === totalDefendingPower && targetCard.type === "unit") {
+      console.log("draw");
+      //draw
+      attackersIds.forEach(attackerId => {
+        let attacker = realDeck.find(card => card.id === attackerId);
+        if(attacker.abilities.includes("FEROCITY")){
+          if(targetCard.abilities && targetCard.abilities.includes("FEROCITY")){
+            let ferocityNum = 0;
+            attackersIds.forEach(attackerId => {
+              let attacker = realDeck.find(card => card.id === attackerId);
+              if(attacker.abilities.includes("FEROCITY")){
+                ferocityNum++;
+                if(ferocityNum > 1){
+                  playCombatGif(target, true);
+                  targetCard.vitality -= plusDamage;
+                  if(targetCard.vitality <= 0){
+                    sources += targetCard.price;
+                    removeCard(target);
+                  }
+                  else{
+                    socket.emit("hurt", targetCard.id, roomId, targetCard.vitality);
+                  }
+                  sources += 2;
+                  oponentSources -= 2;
+                  console.log(sources);
+                }
+              }
+            });
+          } else {
+            playCombatGif(target, true);
+            targetCard.vitality -= plusDamage;
+            if(targetCard.vitality <= 0){
+              sources += targetCard.price;
+              removeCard(target);
+            }
+            else{
+              socket.emit("hurt", targetCard.id, roomId, targetCard.vitality);
+            }
+            sources += 2;
+            oponentSources -= 2;
+            console.log(sources);
+          }
+        }
+      });
+    }
+    else{
+      //defend
+      playCombatGif(target, false);
+      socket.emit("defended", targetCard.id, roomId);
+    }
+    resolvingCombat = false;
+  
+    updateSources();
+    console.log("attackers", attackersIds);
+    attackersIds.forEach(attackerId => {
+      const cardsOnTable = document.querySelectorAll(".filled-zone");
+      cardsOnTable.forEach(card => {
+        if(card.getAttribute("data-card-id") === attackerId){
+          card.removeEventListener('click', handleClick);
+        } 
+      });
+    });
+    attackersIds = [];
+  
+    addHoverEffectToTableCards();
+  
+    if(targetedIds.length === resolvedCombatNum + 1 || targetedIds[resolvedCombatNum + 1] === undefined){
+      resolvedCombatNum = 0;
+      if(isSecond){
+        isSecond = false;
+      } else {
+        isSecond = true;
+      }
+      const targetContainer = document.getElementById("targets");
+      const targets = targetContainer.querySelectorAll('img');
+      targets.forEach(target => {
+        target.style.display = "block";
+      });
+      document.getElementById("nextButton").style.display = "none";
+      document.getElementById("turnIndicator").innerHTML = "Oponents turn";
+      socket.emit("attackPass", roomId);
+      document.getElementById("targets").style.display = "none";
+      document.getElementById("hand").style.display = "block";
+    } else {
+      resolvedCombatNum++;
+      startCombat();
+    }
+  }
+  // zahrani gifu dle vysledku boje
+  function playCombatGif(target, isHurt) {
+    const gifElement = document.createElement('img');
+    gifElement.style.position = 'absolute';
+    gifElement.style.width = '100px'; 
+    gifElement.style.height = '100px'; 
+    gifElement.style.zIndex = '1000';
+    
+    if(isHurt){
+      gifElement.src = 'imgs/boom.gif';
+    } else
+    {
+      gifElement.src = 'imgs/shield.gif';
+    }
+
+    //resi vycentrovani gifu
+    const rect = target.getBoundingClientRect();
+    const cardWidth = rect.width;
+    const cardHeight = rect.height;
+
+    gifElement.style.top = `${rect.top + window.scrollY + (cardHeight / 2) - (parseInt(gifElement.style.height) / 2)}px`;
+    gifElement.style.left = `${rect.left + window.scrollX + (cardWidth / 2) - (parseInt(gifElement.style.width) / 2)}px`;
+
+    document.body.appendChild(gifElement);
+  
+    setTimeout(() => {
+      gifElement.remove();
+    }, 3000);
+  }
+  // passnuti vysledku (defend)
+  socket.on("defended", (cardId)=>{
+    playCombatGif(document.querySelector(`img[data-card-id="${cardId}"]`), false);
+  })
+  // passnuti vysledku (hurt)
+  socket.on("hurt", (cardId, newVitality) => {
+    let card = realDeck.find(card => card.id === cardId);
+    playCombatGif(document.querySelector(`img[data-card-id="${cardId}"]`), true);
+    if(!card){
+      card = oponentDeck.find(card => card.id === cardId);
+    }
+    card.vitality = newVitality;
+    addHoverEffectToTableCards();
+  });
+  // passnuti bojove faze na druheho hrace
+  socket.on("attackPass", (isSec) => {
+    if(isSecond){
+      isSecond = false;
+      removeAllTargetables();
+      addHoverEffectToTableCards();
+      checkForHurt();
+    }
+    else{
+      document.getElementById('turnIndicator').innerHTML = "Its your turn";
+      isSecond = true;
+      document.getElementById("nextButton").style.display = "block";
+      removeAllTargetables();
+      addHoverEffectToTableCards();
+      combatPhase();
+    }
+  });
+  // faze ublizeni pokud ze to nejaka abilita vyzaduje
+  function hurtPhase(woundNumber, nextPhase){
+    console.log("hurtPhase");
+    hurtUnits = 0;
+    canPlay = [false, false, false, true, false, false, true];
+    removeAllEventListeners(document.getElementById("nextButton"));
+    document.getElementById("nextButton").style.display = "block";
+    document.getElementById("nextButton").innerHTML = "Skip hurt phase";
+
+    const cardsOnTable = document.querySelectorAll(".filled-zone");
+    let skip = false;
+    cardsOnTable.forEach(card => {
+      if(card.getAttribute("data-card-race")!=deckColor && card.getAttribute("data-card-type")=="unit"){
+        card.addEventListener('click', handleHurt);
+        skip = true;
+      }
+    });
+    if(!nextPhase){
+      hurtUnits++;
+    }
+
+    document.getElementById("nextButton").addEventListener('click', () => {
+      if(nextPhase){
+        discardPhase();
+      }
+      else{
+        firstPhase(false);
+      }
+    });
+
+    if(!skip){
+      document.getElementById("nextButton").click();
+    }
+  }
+  // ublizeni jednotce
+  function handleHurt(event){
+    let card = event.currentTarget;
+    let cardInDeck = oponentDeck.find(deckCard => deckCard.id === card.getAttribute("data-card-id"));
+    if(!cardInDeck){
+      return;
+    }
+    cardInDeck.vitality -= 1;
+    if(cardInDeck.vitality <= 0){
+      sources += cardInDeck.price;
+      playCombatGif(card, true);
+      removeCard(card);
+      updateSources();
+    }
+    else{
+      playCombatGif(card, true);
+      socket.emit("hurt", cardInDeck.id, roomId, cardInDeck.vitality);
+    }
+    hurtUnits++;
+    if(hurtUnits === 2){
+      let cardsOnTable = document.querySelectorAll(".filled-zone");
+      cardsOnTable.forEach(card => {
+        if(card.getAttribute("data-card-type") != deckColor){
+          card.removeEventListener('click', handleHurt);
+        }
+      });
+
+      document.getElementById("nextButton").click();
+    }
+    
+  }
+  // zjisteni zda je potreba provest ublizeni
+  function checkForHurt(){
+    let cardsOnTable = document.querySelectorAll(".filled-zone");
+    for (let card of cardsOnTable) {
+      if(card.getAttribute("data-card-race") == deckColor && card.getAttribute("data-card-type") == "location" && card.getAttribute("isFliped") != "true"){
+        let cardInDeck = realDeck.find(deckCard => deckCard.id === card.getAttribute("data-card-id"));
+        if(cardInDeck && cardInDeck.special_abilities && cardInDeck.special_abilities.includes("Hurt2")){
+          console.log("hurt2");
+          hurtPhase(2, true);
+          return; 
+        }
+      }
+    }
+
+    discardPhase();
+  }
+  // pata faze - odkladani karet, dobirani karet
+  function discardPhase(){
+    document.getElementById("turnIndicator").innerHTML = "Its your turn";
+    document.getElementById("hand").style.display = "block";
+    console.log("discardPhase");
+    canPlay = [false, false, true, true, false, false, true];
+    removeAllEventListeners(document.getElementById("nextButton"));
+    document.getElementById("nextButton").style.display = "block";
+    document.getElementById("nextButton").innerHTML = "End turn";
+    const handCards = document.querySelectorAll('#hand img');
+    handCards.forEach(card => {
+      card.addEventListener('click', handleCardClick);
+    });
+
+    if(hand.length === 6){
+      document.getElementById("nextButton").addEventListener('click', () => {
+        endPhase();
+      });
+    }
+    else{
+      document.getElementById("nextButton").style.backgroundColor = "grey";
+    }
+
+    document.getElementById("library").addEventListener('click', () => {
+      if(hand.length < 6){
+        drawCard();
+      }
+      if(hand.length === 6 || library.length === 0){
+        document.getElementById("nextButton").style.backgroundColor = "#df5917";
+        removeAllEventListeners(document.getElementById("nextButton"));
+        document.getElementById("nextButton").addEventListener('click', () => {
+          endPhase();
+        });
+      }
+    });
+  }
+  // odhozeni karty
+  function handleCardClick(event) {
+    const card = event.currentTarget;
+
+    card.remove(); 
+    hand = hand.filter(handCard => handCard.id !== card.id);
+    document.getElementById('grave').src = card.src; 
+
+    updateHandCardsTransform();
+    if(hand.length === 6){
+      document.getElementById("nextButton").style.backgroundColor = "#df5917";
+      document.getElementById("nextButton").addEventListener('click', () => {
+        endPhase();
+      });
+    }
+    else{
+      removeAllEventListeners(document.getElementById("nextButton"));
+      document.getElementById("nextButton").style.backgroundColor = "grey";
+    }
+  }
+    // sesta faze - vypocitani dominance na poli
+  function domination(){
+    console.log("domination");
+    let myDomination = 0;
+    let oponentDomination = 0;
+    let myCount = 0;
+    let oponentCount = 0;
+    let plusIncome = 0;
+    let plusOpponentIncome = 0;
+    const table = document.querySelector('table');
+    const rows = table.getElementsByTagName('tr');
+    for(let i = 0; i < rows.length; i++){
+      const cells = rows[i].getElementsByTagName('td');
+      for(let j = 0; j < cells.length; j++){
+        const tile = cells[j].getElementsByTagName('img')[0];
+        if(tile.className === "filled-zone"){
+          if(tile.getAttribute("data-card-race") === deckColor ){
+            console.log(tile);
+            myCount++;
+            if(tile.getAttribute("data-card-type") === "location"){
+              if(tile.getAttribute("isFliped") === "true"){
+                myCount--;
+              }
+              else{
+                myCount++;
+              }
+            }
+            let cardInDeck = realDeck.find(card => card.id === tile.getAttribute("data-card-id"));
+            if(cardInDeck.abilities && cardInDeck.abilities.includes("INCOME")){
+              plusIncome++;
+            }
+          }
+          else{
+            oponentCount++;
+            if(tile.getAttribute("data-card-type") === "location"){
+              if(tile.getAttribute("isFliped") === "true"){
+                oponentCount--;
+              }
+              else{
+                oponentCount++;
+              }
+            }
+            let cardInDeck = oponentDeck.find(card => card.id === tile.getAttribute("data-card-id"));
+            if(cardInDeck.abilities && cardInDeck.abilities.includes("INCOME")){
+              plusOpponentIncome++;
+            }
+          }
+        }
+      }
+      if(myCount > oponentCount){
+        myDomination += 1 + plusIncome;
+      }
+      else if(oponentCount > myCount){
+        oponentDomination += 1 + plusOpponentIncome;
+      }
+      myCount = 0;
+      oponentCount = 0;
+      plusIncome = 0;
+      plusOpponentIncome = 0;
+    }
+
+    const numCols = rows[0].getElementsByTagName('td').length;
+
+    for(let j = 0; j < numCols; j++){
+      for(let i = 0; i < rows.length; i++){
+        const cells = rows[i].getElementsByTagName('td');
+        const tile = cells[j].getElementsByTagName('img')[0];
+        if(tile.className === "filled-zone"){
+          if(tile.getAttribute("data-card-race") === deckColor){
+            console.log(tile);
+            myCount++;
+            if(tile.getAttribute("data-card-type") === "location"){
+              if(tile.getAttribute("isFliped") === "true"){
+                myCount--;
+              }
+              else{
+                myCount++;
+              }
+            }
+            let cardInDeck = realDeck.find(card => card.id === tile.getAttribute("data-card-id"));
+            if(cardInDeck.abilities && cardInDeck.abilities.includes("INCOME")){
+              plusIncome++;
+            }
+          }
+          else{
+            oponentCount++;
+            if(tile.getAttribute("data-card-type") === "location"){
+              if(tile.getAttribute("isFliped") === "true"){
+                oponentCount--;
+              }
+              else{
+                oponentCount++;
+              }
+            }
+            let cardInDeck = oponentDeck.find(card => card.id === tile.getAttribute("data-card-id"));
+            if(cardInDeck.abilities && cardInDeck.abilities.includes("INCOME")){
+              plusOpponentIncome++;
+            }
+          }
+        }
+      }
+      if(myCount > oponentCount){
+        myDomination += 1 + plusIncome;
+      }
+      else if(oponentCount > myCount){
+        oponentDomination += 1 + plusOpponentIncome;
+      }
+      myCount = 0;
+      oponentCount = 0;
+      plusIncome = 0;
+      plusOpponentIncome = 0;
+    }
+
+    console.log("my",myDomination,"oponent", oponentDomination);
+    sources += myDomination;
+    oponentSources += oponentDomination;
+    updateSources();
+    socket.emit("endTurn", roomId);
+  }
+  // sedma faze - konec tahu
+  function endPhase(){
+    document.getElementById('turnIndicator').innerHTML = "Opponent's turn";
+    const handCards = document.querySelectorAll('#hand img');
+    handCards.forEach(card => {
+      card.removeEventListener('click', handleCardClick);
+      let cardInDeck = realDeck.find(deckCard => deckCard.id === card.id);
+      if(cardInDeck.abilities && cardInDeck.abilities.includes("ONETURNCOST")){
+        cardInDeck.abilities = cardInDeck.abilities.filter(ability => ability !== "ONETURNCOST");
+        cardInDeck.price += 2;
+        handCards.forEach(card => {
+          let cardInDeck = realDeck.find(deckCard => deckCard.id === card.id);
+          if(cardInDeck.abilities && cardInDeck.abilities.includes("ONETURNCOST")){
+            cardInDeck.abilities = cardInDeck.abilities.filter(ability => ability !== "ONETURNDEFENSE");
+            cardInDeck.price += 2;
+          }
+        });
+      }
+    });
+    resolvedCombatNum = 0;
+    targetedIds = [undefined, undefined, undefined];
+    //draw
+    console.log("endPhase");
+    document.getElementById("targets").style.display = "none";
+    canPlay = [false, false, false, true, false, false, false];
+    removeAllEventListeners(document.getElementById("nextButton"));
+    removeAllEventListeners(document.getElementById("library"));
+    document.getElementById("nextButton").style.display = "none";
+    const targetContainer = document.getElementById("targets");
+    const targets = targetContainer.querySelectorAll('img');
+    targets.forEach(target => {
+      target.style.display = "block";
+    });
+
+    if(isSecond){
+      socket.emit("attackPass", roomId);
+      isSecond = false;
+    }
+    domination();
+  }
+  // kliknuti na klikle karty
+  function triggerClickedTile(){
+    const table = document.getElementById('board'); 
+    const tiles = table.getElementsByTagName('td'); 
+
+    for (let tile of tiles) {
+      if (tile.firstChild.clicked) {
+        const clickEvent = new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
+        tile.firstChild.dispatchEvent(clickEvent);
+      }
+    }
+  }
+  // konec hry
+  function gameOver(){
+    if(sources >= 30 || oponentSources <= 0){
+      document.getElementById('endScreen').style.display = "block";
+      document.getElementById('endMessage').innerHTML = "You won!";
+    }
+    else{
+      document.getElementById('endScreen').style.display = "block";
+      document.getElementById('endMessage').innerHTML = "You lost!";
+    }
+
+  }
+  // aktualizace zdroju
+  function updateSources(){
+    if(sources <= 0 || oponentSources <= 0 || sources >= 30 || oponentSources >= 30){
+      gameOver();
+    }
+    document.getElementById('sources').textContent = sources;
+    document.getElementById('oponentSources').textContent = oponentSources;
+    socket.emit("updateSources", roomId, sources, oponentSources);
+  }
+  // passnuti zdroju
+  socket.on("updateSources", (newSources, mySources) => {
+    oponentSources = newSources;
+    sources = mySources;
+    if(sources <= 0 || oponentSources <= 0 || sources >= 30 || oponentSources >= 30){
+      gameOver();
+    }
+    document.getElementById('oponentSources').textContent = oponentSources;
+    document.getElementById('sources').textContent = sources;
+  });
+  // update mist kam hrac muze pokladat jednotky od lokaci
+  function filterExploreArea(tile){
+    let directions = [
+      { row: -1, col: 0 }, // up
+      { row: 1, col: 0 },  // down
+      { row: 0, col: -1 }, // left
+      { row: 0, col: 1 }   // right
+    ];
+
+    let currentRow = tile.parentNode.parentNode.rowIndex;
+    let currentCol = tile.parentNode.cellIndex;
+    
+    directions.forEach(direction => {
+      let newRow = currentRow + direction.row;
+      let newCol = currentCol + direction.col;
+      let newTile = document.querySelector(`table tr:nth-child(${newRow + 1}) td:nth-child(${newCol + 1}) img`);
+      if(newTile && !newTile.classList.contains("filled-zone")){
+        let skip = false;
+
+        directions.forEach(directionInner => {
+          let newDirectionRow = newRow + directionInner.row;
+          let newDirectionCol = newCol + directionInner.col;
+          let newDirectionTile = document.querySelector(`table tr:nth-child(${newDirectionRow + 1}) td:nth-child(${newDirectionCol + 1}) img`);
+
+          if(newDirectionTile && newDirectionTile === tile){
+            return; 
+          }
+
+          if(newDirectionTile && newDirectionTile.classList.contains("filled-zone")){
+            if(newDirectionTile.getAttribute("data-card-type") === "location" && newDirectionTile.getAttribute("data-card-race")===deckColor){
+              skip = true;
+            }
+          }
+        });
+        if(!skip){
+          console.log(newTile.id, playableUnitTiles);
+          if((team == "tails" && newTile.parentNode.cellIndex != 0) || (team == "paws" && newTile.parentNode.cellIndex != 4)){
+            playableUnitTiles = playableUnitTiles.filter(tile => tile.id !== newTile.id);
+          }
+        }
+      }
+    });
+  }
+  // odebrani karty
+  function removeCard(card){
+    let cardToRemove = document.getElementById(card.id);
+    if(team == "tails" && cardToRemove.parentNode.cellIndex == 0){
+      playableUnitTiles.push(card.id);
+    }
+    else if(team == "paws" && cardToRemove.parentNode.cellIndex == 4){
+      playableUnitTiles.push(card.id);
+    }
+
+    if(cardToRemove.getAttribute("data-card-type")==="location"){
+      filterExploreArea(cardToRemove);
+    }
+
+    let directions = [
+      { row: -1, col: 0 }, // up
+      { row: 1, col: 0 },  // down
+      { row: 0, col: -1 }, // left
+      { row: 0, col: 1 }   // right
+    ];
+
+    directions.forEach(direction => {
+      let newRow = cardToRemove.parentNode.parentNode.rowIndex + direction.row;
+      let newCol = cardToRemove.parentNode.cellIndex + direction.col;
+      let newTile = document.querySelector(`table tr:nth-child(${newRow + 1}) td:nth-child(${newCol + 1}) img`);
+      if(newTile && newTile.classList.contains("filled-zone") && newTile.getAttribute("data-card-type") === "location" && newTile.getAttribute("data-card-race") === deckColor){
+          playableUnitTiles.push(cardToRemove);
+        }
+      }
+    );
+    
+    cardToRemove.src = "imgs/empty.png";
+    cardToRemove.removeAttribute("data-card-id");
+    cardToRemove.removeAttribute("data-card-type");
+    cardToRemove.removeAttribute("data-card-race");
+    cardToRemove.className = "";
+    if(cardToRemove.nextSibling){
+      cardToRemove.nextSibling.remove();
+      socket.emit("removeTarget", card.id, roomId);
+    }
+    socket.emit("removeCard", roomId, card.id);
+    recountCosts();
+  }
+  // passnuti odebrani karty
+  socket.on("removeCard", (cardId) => {
+    let cardToRemove = document.getElementById(cardId);
+    if(team == "tails" && cardToRemove.parentNode.cellIndex == 0){
+      playableUnitTiles.push(document.getElementById(cardId));
+    }
+    else if(team == "paws" && cardToRemove.parentNode.cellIndex == 4){
+      playableUnitTiles.push(document.getElementById(cardId));
+    }
+    if(cardToRemove.getAttribute("data-card-type")==="location"){
+      filterExploreArea(cardToRemove);
+    }
+
+    playCombatGif(document.querySelector(`img[data-card-id="${cardToRemove.getAttribute("data-card-id")}"]`), true);
+    const cardInDeck = realDeck.find(card => card.id === cardToRemove.getAttribute("data-card-id"));
+    if(!cardInDeck){
+      const cardInDeck = oponentDeck.find(card => card.id === cardToRemove.getAttribute("data-card-id"));
+    }
+
+    let directions = [
+      { row: -1, col: 0 }, // up
+      { row: 1, col: 0 },  // down
+      { row: 0, col: -1 }, // left
+      { row: 0, col: 1 }   // right
+    ];
+
+    directions.forEach(direction => {
+      let newRow = cardToRemove.parentNode.parentNode.rowIndex + direction.row;
+      let newCol = cardToRemove.parentNode.cellIndex + direction.col;
+      let newTile = document.querySelector(`table tr:nth-child(${newRow + 1}) td:nth-child(${newCol + 1}) img`);
+      if(newTile && newTile.classList.contains("filled-zone") && newTile.getAttribute("data-card-type") === "location" && newTile.getAttribute("data-card-race") === deckColor){
+          playableUnitTiles.push(cardToRemove);
+        }
+      }
+    );
+    console.log(cardInDeck);
+
+    let controlledAbility;
+    if(cardInDeck.special_abilities && cardInDeck.special_abilities.includes("ControlledFerocity")){
+      controlledAbility = "FEROCITY";
+    }
+    else if(cardInDeck.special_abilities && cardInDeck.special_abilities.includes("ControlledDamagePlusOne")){
+      controlledAbility = "DAMAGEPLUSONE";
+    }
+    else if(cardInDeck.special_abilities && cardInDeck.special_abilities.includes("ControlledInfect")){
+      controlledAbility = "INFECT";
+    }
+    else if(cardInDeck.special_abilities && cardInDeck.special_abilities.includes("ControlledAttackPlusOne")){
+      controlledAbility = "ATTACKPLUSONE";
+    }
+    else if(cardInDeck.special_abilities && cardInDeck.special_abilities.includes("ControlledDefensePlusOne")){
+      controlledAbility = "DEFENSEPLUSONE";
+    }
+    
+
+    if(controlledAbility != undefined){
+      let cardsOnBoard = document.querySelectorAll(".filled-zone");
+      cardsOnBoard.forEach(card => {
+        const cardOnBoard = realDeck.find(cardIn => cardIn.id === card.getAttribute("data-card-id"));
+        if(!cardOnBoard){
+          const cardOnBoard = oponentDeck.find(cardIn => cardIn.id === card.getAttribute("data-card-id"));
+        }
+        console.log(cardOnBoard);
+        if(cardOnBoard && cardOnBoard.abilities && cardOnBoard.abilities.includes(controlledAbility)){
+          const cardInReferDeck = referDeck.find(cardIn => cardIn.id === card.getAttribute("data-card-id"));
+          if(!cardInReferDeck){
+            const cardInReferDeck = referOponentDeck.find(cardIn => cardIn.id === card.getAttribute("data-card-id"));
+          }
+          console.log(cardInReferDeck);
+          if(cardInReferDeck && cardInReferDeck.abilities && !cardInReferDeck.abilities.includes(controlledAbility)){
+            cardOnBoard.abilities = cardOnBoard.abilities.filter(ability => ability !== controlledAbility);
+            if(controlledAbility === "ATTACKPLUSONE"){
+              cardOnBoard.attack += -1;
+            }
+            if(controlledAbility === "DEFENSEPLUSONE"){
+              cardOnBoard.defense += -1;
+            }
+          }
+        }
+      });
+    }
+    grave.push(cardInDeck);
+    socket.emit("updateDeck", roomId, realDeck);
+    document.getElementById('grave').src = cardToRemove.src;
+    cardToRemove.src = "imgs/empty.png";
+    cardToRemove.removeAttribute("data-card-id");
+    cardToRemove.removeAttribute("data-card-type");
+    cardToRemove.removeAttribute("data-card-race");
+    cardToRemove.className = "";
+    if(cardToRemove.nextSibling){
+      cardToRemove.nextSibling.remove();
+    }
+  });
+  // passnuti zmeny decku 
+  socket.on("updateDeck", (newDeck) => {
+    oponentDeck = newDeck;
+  });
+  // usporadani karet v ruce
+  function updateHandCardsTransform() {
+    const handElement = document.getElementById('hand');
+    const cardImages = handElement.querySelectorAll('img');
+
+    cardImages.forEach((cardImg, index) => {
+      cardImg.style.transform = 'rotate(' + (30 * (index + 1)) + 'deg) translateY(-17vh)';
+    });
+
+    const handTurn = (cardImages.length * 30 / -2);
+    handElement.style.transform = 'rotate(' + (handTurn - 15) + 'deg)';
+
+    if (cardImages.length === 1) {
+      handElement.style.left = "43%";
+      handElement.style.top = "88vh";
+    }
+    else if (cardImages.length === 2) {
+      handElement.style.left = "42.5%";
+      handElement.style.top = "90vh";
+    }
+    else if(cardImages.length === 3){
+      handElement.style.left = "42%";
+      handElement.style.top = "92vh";
+    }
+    else if (cardImages.length === 4) {
+      handElement.style.left = "43%";
+      handElement.style.top = "94vh";
+    }
+    else if (cardImages.length === 5) {
+      handElement.style.left = "44%";
+      handElement.style.top = "97vh";
+    }
+    else if (cardImages.length === 6) {
+      handElement.style.left = "45.5%";
+      handElement.style.top = "100vh";
+    }
+  }
+  // dobrani karty
+  function drawCard(){
+    if(library.length > 0){
+      drawnCard = library.pop();
+      hand.push(drawnCard);
+      let handElement = document.getElementById('hand');
+      let cardImg = document.createElement('img');
+      handElement.appendChild(cardImg);
+      cardImg.src = drawnCard.img_url; 
+      cardImg.id = drawnCard.id;
+      cardImg.className = "cardInHand";
+      cardImg.style.position = 'absolute';
+      cardImg.setAttribute("data-card-type", drawnCard.type);
+      cardImg.setAttribute("data-card-cost", drawnCard.price);
+      cardImg.setAttribute("data-card-race", drawnCard.race)
+      
+      updateHandCardsTransform();
+
+      cardImg.addEventListener('mouseover', () => {
+        cardImg.style.zIndex = '100';
+        let checkImg = document.getElementById('checkImg');
+        const realCard = realDeck.find(card => card.id === cardImg.id);
+        const originalCard = referDeck.find(card => card.id === cardImg.id);
+        if(realCard && realCard.type == "unit" && originalCard){
+          if(realCard.attack !== originalCard.attack) {
+            document.getElementById('attack').style.display = "block";
+            document.getElementById('attack').children[1].textContent = realCard.attack - originalCard.attack;
+          }
+          if(realCard.defense !== originalCard.defense) {
+            document.getElementById('defend').style.display = "block";
+            document.getElementById('defend').children[1].textContent = realCard.defense - originalCard.defense;
+          }
+          if(realCard.vitality !== originalCard.vitality) {
+            document.getElementById('vitality').style.display = "block";
+            document.getElementById('vitality').children[1].textContent = realCard.vitality - originalCard.vitality;
+          }
+          if(realCard.price !== originalCard.price) {
+            document.getElementById('cost').style.display = "block";
+            document.getElementById('cost').children[1].textContent = realCard.price - originalCard.price;
+          }
+        }
+        checkImg.src = cardImg.src; 
+      });
+
+      cardImg.addEventListener('mouseout', () => {
+        cardImg.style.zIndex = '5';
+        let checkImg = document.getElementById('checkImg');
+        checkImg.src = 'imgs/empty.png'; 
+        document.getElementById('attack').style.display = "none";
+        document.getElementById('defend').style.display = "none";
+        document.getElementById('vitality').style.display = "none";
+        document.getElementById('cost').style.display = "none";
+      });
+
+      cardImg.draggable = true;
+
+      cardImg.addEventListener('dragstart', (event) => {
+        if ((cardImg.getAttribute("data-card-type") === "unit" && canPlay[0] === false) || (cardImg.getAttribute("data-card-type") === "location" && !canPlay[1]) || (cardImg.getAttribute("data-card-type") === "anytime" && canPlay[2] === false) || (sources - cardImg.getAttribute("data-card-cost") <= 0)) {
+          console.log("not allowed");
+          event.preventDefault(); 
+          return;
+        }
+        makeTilesPlayable(true, cardImg.getAttribute("data-card-type"));
+        event.dataTransfer.setData('text/plain', cardImg.id);
+        const handCards = document.querySelectorAll('#hand img');
+        handCards.forEach(card => {
+          if (card !== cardImg) {
+            card.style.visibility = 'hidden';
+          }
+        });
+
+        setTimeout(() => {
+          cardImg.style.display = 'none';
+        }, 0);
+      });
+
+      cardImg.addEventListener('dragend', () => {
+        makeTilesPlayable(false, cardImg.getAttribute("data-card-type"));
+        cardImg.style.display = 'block';
+        const handCards = document.querySelectorAll('#hand img');
+        handCards.forEach(card => {
+          card.style.visibility = 'visible';
+        });
+        updateHandCardsTransform();
+      });
+    }
+  }
+  // pridani hover efektu na karty
+  function addHoverEffectToTableCards() {
+    const tableCards = document.querySelectorAll('.board table tr td img');
+
+    tableCards.forEach(cardImg => {
+      cardImg.addEventListener('mouseover', () => {
+        cardImg.style.zIndex = '100'; 
+        let checkImg = document.getElementById('checkImg');
+        if (cardImg.className == 'filled-zone' && cardImg.getAttribute("data-card-type") == "unit") {
+          let realCard;
+          let originalCard;
+          if(cardImg.getAttribute("data-card-race") === deckColor){
+            realCard = realDeck.find(card => card.id === cardImg.getAttribute("data-card-id"));
+            originalCard = referDeck.find(card => card.id === cardImg.getAttribute("data-card-id"));
+          }
+          else{
+            realCard = oponentDeck.find(card => card.id === cardImg.getAttribute("data-card-id"));
+            originalCard = referOponentDeck.find(card => card.id === cardImg.getAttribute("data-card-id"));
+          }
+          if(realCard.attack !== originalCard.attack) {
+            document.getElementById('attack').style.display = "block";
+            document.getElementById('attack').children[1].textContent = realCard.attack - originalCard.attack;
+          }
+          if(realCard.defense !== originalCard.defense) {
+            document.getElementById('defend').style.display = "block";
+            document.getElementById('defend').children[1].textContent = realCard.defense - originalCard.defense;
+          }
+          if(realCard.vitality !== originalCard.vitality) {
+            document.getElementById('vitality').style.display = "block";
+            document.getElementById('vitality').children[1].textContent = realCard.vitality - originalCard.vitality;
+          }
+          if(realCard.price !== originalCard.price) {
+            document.getElementById('cost').style.display = "block";
+            document.getElementById('cost').children[1].textContent = realCard.price - originalCard.price;
+          }
+        }
+        checkImg.src = cardImg.src;
+      });
+
+      cardImg.addEventListener('mouseout', () => {
+        cardImg.style.zIndex = '5'; 
+        let checkImg = document.getElementById('checkImg');
+        document.getElementById('attack').style.display = "none";
+        document.getElementById('defend').style.display = "none";
+        document.getElementById('vitality').style.display = "none";
+        document.getElementById('cost').style.display = "none";
+        checkImg.src = 'imgs/empty.png';
+      });
+    });
+  }
+  // specialni efekt na jedno kolo
+  function oneTurnEffect(effect){
+    console.log("oneTurnEffect");
+    //canPlay = [false, false, true, true, false, false, true];
+    const nextButton = document.getElementById("nextButton");
+    nextButton.disabled = true; 
+    nextButton.style.backgroundColor = "grey"; 
+
+    const cardsOnTable = document.querySelectorAll(".filled-zone");
+    let skip = false;
+    cardsOnTable.forEach(card => {
+      if(card.getAttribute("data-card-race") == deckColor && card.getAttribute("data-card-type") == "unit"){
+        let realCard = realDeck.find(cardObj => cardObj.id === card.getAttribute("data-card-id"));
+        if(realCard.abilities && realCard.abilities.includes("ONETURNDEFENSE")){
+          return;
+        }
+        card.addEventListener('click', (event) => handleEffect(event, effect));
+        skip = true;
+      }
+    });
+
+    if(!skip){
+      nextButton.disabled = false; 
+      nextButton.style.backgroundColor = "#df5917"; 
+    }
+  }
+  // provedeni specialniho efektu
+  function handleEffect(event, effect){
+    let card = event.currentTarget;
+    let cardInDeck = realDeck.find(deckCard => deckCard.id === card.getAttribute("data-card-id"));
+    if(!cardInDeck){
+      return;
+    }
+
+    if(cardInDeck.abilities && cardInDeck.abilities.includes("ONETURNDEFENSE")){
+      return;
+    }
+
+    if(effect === "TurnPlusTwoDefense"){
+      cardInDeck.defense += 2;
+      if(cardInDeck.abilities){
+        cardInDeck.abilities.push("ONETURNDEFENSE");
+      }
+      else{
+        cardInDeck.abilities = ["ONETURNDEFENSE"];
+      }
+    }
+    socket.emit("updateDeck", roomId, realDeck);
+
+    document.getElementById("nextButton").disabled = false;
+    document.getElementById("nextButton").style.backgroundColor = "#df5917";
+    const cardsOnTable = document.querySelectorAll(".filled-zone");
+    cardsOnTable.forEach(card => {
+      if(card.getAttribute("data-card-race") == deckColor && card.getAttribute("data-card-type") == "unit"){
+        card.removeEventListener('click', handleEffect);
+      }
+    });
+  }
+  // otoceni lokace pass
+  socket.on("flipLocation", (locationId, isFliped) => {
+    const location = document.querySelector(`img[data-card-id="${locationId}"]`);
+    if(isFliped){
+      location.src = "imgs/sleeve.png";
+      location.setAttribute("isFliped", true);
+    }
+    else{
+      let locationCard = realDeck.find(card => card.id === location.getAttribute("data-card-id"));
+      if(!locationCard){
+        locationCard = oponentDeck.find(card => card.id === location.getAttribute("data-card-id"));
+      }
+      console.log(locationCard);
+      console.log(locationCard.img_url);
+      location.src = locationCard.img_url;
+      location.setAttribute("isFliped", false);
+    }
+  });
+  // deklarace targetu
+  const targets = document.querySelectorAll('.targets img');
+  targets.forEach(target => {
+    target.addEventListener("dragstart", (event) => {
+      const targetNumber = parseInt(event.target.id.match(/\d+/)[0], 10);
+      const previousTarget = document.getElementById("target" + (targetNumber - 1));
+
+      if (previousTarget && previousTarget.style.display === "block") {
+        event.preventDefault(); 
+        return;
+      }
+      const handCards = document.querySelectorAll('#hand img');
+      handCards.forEach(card => {
+        card.style.visibility = 'hidden';
+      });
+      event.dataTransfer.setData('text/plain', event.target.id);
+    });
+    target.addEventListener("dragend", () => {
+      const handCards = document.querySelectorAll('#hand img');
+      handCards.forEach(card => {
+        card.style.visibility = 'visible';
+      });
+    });
+  });
+  // najit vsechny mozne cile utoku
+  function findAllTargetables(){
+    let cards = document.querySelectorAll(".filled-zone"); 
+    cards = Array.prototype.filter.call(cards, card => card.getAttribute("data-card-race") != deckColor);
+
+    cards.forEach(card => {
+      if(card.getAttribute("data-card-type") == "location" && card.getAttribute("isFliped") == "true"){
+        return;
+      }
+      const cardRace = oponentDeck.find(cardObj => cardObj.id === card.getAttribute("data-card-id")).race;
+      const cardType = oponentDeck.find(cardObj => cardObj.id === card.getAttribute("data-card-id")).type;
+      
+      if(cardRace != deckColor && findAllAttackers(card).length != 0){
+        card.addEventListener('dragover', (event) => {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = 'move';
+        });
+        
+        function handleTargetDrop(event) {
+          if(canPlay[5]){
+            let droppedItemId = event.dataTransfer.getData('text/plain');
+            let droppedItem = document.getElementById(droppedItemId);
+            let targetElement = document.createElement('img');
+            targetElement.style.zIndex = '100';
+            targetElement.style.position = 'absolute';
+            targetElement.style.width = '5.5vh';
+            targetElement.style.height = '5vh';
+            targetElement.style.left = '50%';
+            targetElement.style.top = '50%';
+            targetElement.style.transform = 'translate(-50%, -50%)';
+            targetElement.id = droppedItemId;
+            targetElement.className = "target";
+            let targetNumber = parseInt(droppedItemId.match(/\d+/)[0], 10);
+            if(targetNumber === 1){
+              targetElement.src = "imgs/target1.png";
+            }
+            else if(targetNumber === 2){
+              targetElement.src = "imgs/target2.png";
+            }
+            else if(targetNumber === 3){
+              targetElement.src = "imgs/target3.png";
+            }
+            targetedIds[targetNumber - 1] = card.parentNode.firstChild.id;
+            card.parentNode.appendChild(targetElement);
+            console.log(targetedIds);
+            socket.emit("addTarget", roomId, card.id, targetNumber);
+            if(document.getElementById("nextButton").innerHTML === "Next"){
+              removeAllEventListeners(document.getElementById("nextButton"));
+              document.getElementById("nextButton").innerHTML = "Start Combat";
+              document.getElementById("nextButton").addEventListener('click', () => {
+                startCombat();
+              });
+            }
+
+            droppedItem.style.display = 'none';
+            card.removeEventListener('drop', handleTargetDrop);
+          }
+        }
+        card.addEventListener('drop', handleTargetDrop);
+
+      }
+    })
+  }
+  //pridat target pass
+  socket.on("addTarget", (targetId, targetNum) => {
+    let target = document.getElementById(targetId);
+    let targetElement = document.createElement('img');targetElement.src = "imgs/coinPaws.png";
+    targetElement.style.zIndex = '100';
+    targetElement.style.position = 'absolute';
+    targetElement.style.width = '5.5vh';
+    targetElement.style.height = '5vh';
+    targetElement.style.left = '50%';
+    targetElement.style.top = '50%';
+    targetElement.style.transform = 'translate(-50%, -50%)';
+    targetElement.className = "target";
+    if(targetNum === 1){
+      targetElement.src = "imgs/target1.png";
+    }
+    else if(targetNum === 2){
+      targetElement.src = "imgs/target2.png";
+    }
+    else if(targetNum === 3){
+      targetElement.src = "imgs/target3.png";
+    }
+    target.parentElement.appendChild(targetElement);
+  });
+  //oddelat target pass
+  socket.on("removeTarget", (targetId) => { 
+    let target = document.getElementById(targetId);
+    target.nextSibling.remove();
+  });
+  // oddelat listenery z cilu
+  function removeAllTargetables(){
+    const cards = document.querySelectorAll(".filled-zone");
+
+    cards.forEach(card => {
+      if(card.getAttribute("data-card-race") != deckColor){
+        removeAllEventListeners(card);
+      }
+    });
+  }
+  // nalezeni tilu kam se jednotka muze pohybovat
+  function findMovableTiles(clickedTile) {
+    const currentRow = clickedTile.parentNode.parentNode.rowIndex;
+    const currentCol = clickedTile.parentNode.cellIndex;
+
+    const directions = [
+      { row: -1, col: 0 }, // up
+      { row: 1, col: 0 },  // down
+      { row: 0, col: -1 }, // left
+      { row: 0, col: 1 }   // right
+    ];
+
+    const movableTiles = [];
+
+    directions.forEach(direction => {
+      const newRow = currentRow + direction.row;
+      const newCol = currentCol + direction.col;
+      const newZone = document.querySelector(`table tr:nth-child(${newRow + 1}) td:nth-child(${newCol + 1}) img`);
+      if (newZone && !newZone.classList.contains('filled-zone')) {
+        movableTiles.push(newZone);
+      }
+    });
+
+    return movableTiles;
+  }
+  // pass pohybu
+  socket.on("moveOnBoard", (cardUrl, moveFromx, moveFromy, moveTox, moveToy) => {
+    let table = document.querySelector('.board table');
+    let rowFrom = table.rows[moveFromx];
+    let cellFrom = rowFrom.cells[moveFromy];
+    let rowTo = table.rows[moveTox];
+    let cellTo = rowTo.cells[moveToy];
+
+    cellTo.firstChild.setAttribute("data-card-id", cellFrom.firstChild.getAttribute("data-card-id"));
+    cellTo.firstChild.setAttribute("data-card-race", cellFrom.firstChild.getAttribute("data-card-race"));
+    cellTo.firstChild.setAttribute("data-card-type", cellFrom.firstChild.getAttribute("data-card-type"));
+    cellFrom.firstChild.removeAttribute("data-card-id");
+    cellFrom.firstChild.removeAttribute("data-card-race");
+    cellFrom.firstChild.removeAttribute("data-card-type");
+
+    cellFrom.firstChild.className = "";
+    cellTo.firstChild.className = "filled-zone";
+
+    cellTo.firstChild.src = cardUrl;
+    cellFrom.firstChild.src = "imgs/empty.png";
+
+    playableUnitTiles.forEach(tile => {
+      if(cellTo.firstChild.id == tile.id){
+        playableUnitTiles.splice(playableUnitTiles.indexOf(tile), 1);
+        return;
+      }
+    }); 
+
+    let directions = [
+      { row: -1, col: 0 }, // up
+      { row: 1, col: 0 },  // down
+      { row: 0, col: -1 }, // left
+      { row: 0, col: 1 }   // right
+    ];
+
+    directions.forEach(direction => {
+      let newRow = cellFrom.firstChild.parentNode.parentNode.rowIndex + direction.row;
+      let newCol = cellFrom.firstChild.parentNode.cellIndex + direction.col;
+      let newTile = document.querySelector(`table tr:nth-child(${newRow + 1}) td:nth-child(${newCol + 1}) img`);
+      console.log(newTile);
+      if (!newTile) {
+        console.log("newTile is null, continuing to next iteration");
+        return; 
+      }
+      if(newTile && newTile.classList.contains("filled-zone") && newTile.getAttribute("data-card-type") === "location" && newTile.getAttribute("data-card-race") === deckColor){
+        console.log("newTile is location");
+        playableUnitTiles.push(cellFrom.firstChild);
+      }
+      }
+    );
+
+    if(team === "tails"){
+      cellTo.style.transform = 'rotate(270deg)';
+    }
+    else{
+      cellTo.style.transform = 'rotate(90deg)';
+    }
+    addHoverEffectToTableCards();
+
+  });
+  //pass pridani karty
+  socket.on("addCardToBoard", (cardUrl, x, y, cardId, cardCost, cardType, cardRace, deck) => {
+    let table = document.querySelector('.board table');
+    let row = table.rows[x];
+    let cell = row.cells[y];
+    cell.firstChild.src = cardUrl;
+    cell.firstChild.style.opacity = '1';
+    cell.firstChild.setAttribute("data-card-id", cardId);
+    cell.firstChild.setAttribute("data-card-type", cardType);
+    cell.firstChild.setAttribute("data-card-race", cardRace);
+    oponentSources -= cardCost;
+    console.log(oponentSources);
+    cell.firstChild.className = "filled-zone";
+    oponentDeck = deck;
+    
+    playableUnitTiles.forEach(tile => {
+      if(cell.firstChild.id == tile.id){
+        playableUnitTiles.splice(playableUnitTiles.indexOf(tile), 1);
+        return;
+      }
+    });
+
+    if(cardType === "location"){
+      cell.firstChild.setAttribute("isFliped", "false");
+    }
+    document.getElementById('oponentSources').textContent = oponentSources;
+    if(team === "tails"){
+      cell.style.transform = 'rotate(270deg)';
+    }
+    else{
+      cell.style.transform = 'rotate(90deg)';
+    }
+    addHoverEffectToTableCards();
+  });
+    // debugovaci funkce
+    socket.on('greetUser', (message) => {
+      console.log('Greeting received:', message);
+      const messageList = document.getElementById('messagesList');
+      messageList.textContent = message;
+    });
+    // tlacitka
+    document.getElementById('leaveRoomButton').addEventListener('click', () => {
+      socket.emit('leaveRoom', roomId);
+    });
+    document.getElementById('isReadyButton').addEventListener('click', () => {
+      const button = document.getElementById('isReadyButton');
+      button.style.backgroundColor = "gray";
+      button.disabled = true;
+      socket.emit('isReady', roomId);
+    });
+    // debugovaci funkce
+    socket.on("message", (message) => {
+      console.log(message);
+    });
+  </script>
+</body>
+</html>
