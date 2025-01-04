@@ -1,0 +1,1 @@
+Dokumentace a prezentace jsou ve složce other
